@@ -1,7 +1,7 @@
 import QuestionsCard from "./QuestionsCard";
 
-export default function Room({ params }: { params: { roomId: string } }) {
-  const { roomId } = params;
+export default async function Room({ params }: { params: { roomId: string } }) {
+  const { roomId } = await params;
 
   return (
     <div className="flex flex-col items-center  p-5 min-h-screen bg-background-light">
