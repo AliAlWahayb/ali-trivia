@@ -15,14 +15,14 @@ export default function Home() {
       <div className="flex flex-col gap-6 w-full max-w-sm">
         <Link
           href="/join-game"
-          className="w-full bg-primary text-white text-center font-semibold py-4 rounded-lg shadow-lg hover:bg-secondary transition duration-300 transform active:scale-95"
+          className="w-full bg-primary text-white text-center font-semibold py-4 rounded-lg  hover:bg-secondary transition duration-300 transform active:scale-95"
         >
           Join Game
         </Link>
 
         <Link
           href="/create-game"
-          className="w-full bg-backgroundLight text-primary text-center font-semibold border-2 border-primary py-4 rounded-lg shadow-lg hover:bg-primary hover:text-white transition duration-300 transform active:scale-95"
+          className="w-full bg-backgroundLight text-primary text-center font-semibold border-2 border-primary py-4 rounded-lg  hover:bg-primary hover:text-white transition duration-300 transform active:scale-95"
         >
           Create Game
         </Link>
