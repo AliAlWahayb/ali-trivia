@@ -1,3 +1,7 @@
+import { cookies } from "next/headers";
+import { verifyToken } from "../../../lib/jwt";
+import { redirect } from "next/navigation";
+
 interface Player {
   name: string;
   points: number;
@@ -21,7 +25,14 @@ export default async function LeaderBoard({
 }: {
   params: { roomId: string };
 }) {
-  const { roomId } = params;
+  const { roomId } = await params;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+  const payload = token ? verifyToken(token) : null;
+
+  if (!payload || payload.role !== "spectator" || payload.roomId !== roomId) {
+    redirect("/");
+  }
   const players = await getLeaderboard(roomId);
 
   // Sort by points descending

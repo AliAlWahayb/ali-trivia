@@ -1,6 +1,8 @@
 import CreateRoomForm from "./CreateRoomForm";
 
 export default function CreateRoom() {
+
+
   return (
     <div className="flex flex-col items-center  p-5 min-h-screen bg-background-light">
       <h1 className="text-4xl font-bold mb-6 text-text-primary text-center">
@@ -13,6 +15,7 @@ export default function CreateRoom() {
         </h1>
         <CreateRoomForm />
       </div>
+      
     </div>
   );
 }

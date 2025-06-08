@@ -2,6 +2,7 @@
 
 import { useForm, FormProvider } from "react-hook-form";
 import TextInput from "@/components/TextInput";
+import { useRouter } from "next/navigation";
 
 interface JoinLeaderBoardFormData {
   roomCode: string;
@@ -15,17 +16,28 @@ export default function JoinLeaderBoardForm() {
   });
 
   const { handleSubmit, register } = methods;
+  const router = useRouter();
 
-  const onSubmit = (data: JoinLeaderBoardFormData) => {
+  const onSubmit = async (data: JoinLeaderBoardFormData) => {
     console.log("Joining room with data:", data);
-    // Add your join logic here
+
+    const formData = new FormData();
+    formData.append("roomId", data.roomCode);
+    const res = await fetch("/api/leader-board", {
+      method: "POST",
+      body: formData,
+    });
+    const result = await res.json();
+    if (result.roomId) {
+      console.log("Joined room successfully:", result);
+      router.push(`/LeaderBoard/${result.roomId}`);
+    }
   };
 
   return (
     <div className="w-full max-w-md bg-white rounded-lg  px-6 py-3">
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-
           {/* Room Code */}
           <TextInput
             label="Room Code"
@@ -36,7 +48,6 @@ export default function JoinLeaderBoardForm() {
             required
             {...register("roomCode")}
           />
-
 
           {/* Submit Button */}
           <button

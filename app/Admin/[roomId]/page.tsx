@@ -1,9 +1,20 @@
 import AdminAccordion from "./Accordion";
 import QuestionsCard from "./QuestionsCard";
 import Queue from "./Queue";
+import { cookies } from "next/headers";
+import { verifyToken } from "../../../lib/jwt";
+import { redirect } from "next/navigation";
 
 export default async function Room({ params }: { params: { roomId: string } }) {
   const { roomId } = await params;
+
+  const cookieStore = cookies();
+  const token = (await cookieStore).get("token")?.value;
+  const payload = token ? verifyToken(token) : null;
+
+  if (!payload || payload.role !== "admin" || payload.roomId !== roomId) {
+    redirect("/");
+  }
 
   return (
     <div className="flex flex-col items-center  p-5 min-h-screen bg-background-light">

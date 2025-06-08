@@ -25,6 +25,7 @@ interface CreateRoomFormData {
 }
 
 export default function CreateRoomPage( ) {
+  
 
   const router = useRouter(); // Initialize router
 
@@ -105,7 +106,7 @@ export default function CreateRoomPage( ) {
       console.log("Room created successfully:", result);
 
       // Redirect to the admin game master dashboard using the actual roomId from the server response
-      router.push(`/admin/${result.roomId}`);
+      router.push(`/Admin/${result.roomId}`);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Failed to create room:", error);
