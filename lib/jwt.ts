@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-const SECRET = process.env.JWT_SECRET!;
+const SECRET = process.env.JWT_SECRET! as string;
 
 export function signToken(payload: object) {
     return jwt.sign(payload, SECRET, { expiresIn: "1h" });
