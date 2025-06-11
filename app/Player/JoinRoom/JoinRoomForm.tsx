@@ -20,17 +20,46 @@ export default function JoinRoomForm() {
   const router = useRouter();
 
   const onSubmit = async (data: JoinRoomFormData) => {
-    const formData = new FormData();
-    formData.append("username", data.name);
-    formData.append("roomId", data.roomCode);
-    const res = await fetch("/api/join-room", {
-      method: "POST",
-      body: formData,
-    });
-    const result = await res.json();
-    if (result.roomId) {
-      console.log("Joined room successfully:", result);
-      router.push(`/Player/${result.roomId}`);
+    try {
+      // 1. Join Room API Request
+      const formData = new FormData();
+      formData.append("username", data.name);
+      formData.append("roomId", data.roomCode);
+      const roomRes = await fetch("/api/join-room", {
+        method: "POST",
+        body: formData,
+      });
+      const roomResult = await roomRes.json();
+
+      if (roomResult.error) {
+        console.error("Error joining room:", roomResult.error);
+        return;
+      }
+
+      console.log("Joined room successfully:", roomResult);
+
+      // 2. Join Leaderboard API Request
+      const leaderBoardRes = await fetch("/api/join-leader-board", {
+        method: "POST",
+        body: JSON.stringify({
+          roomId: roomResult.roomId,
+          player: data.name,
+        }),
+        headers: { "Content-Type": "application/json" },
+      });
+      const leaderBoardResult = await leaderBoardRes.json();
+
+      if (leaderBoardResult.error) {
+        console.error("Error adding to leaderboard:", leaderBoardResult.error);
+        return;
+      }
+
+      console.log("Player added to leaderboard:", leaderBoardResult);
+
+      // 3. Redirect to the player's room
+      router.push(`/Player/${roomResult.roomId}`);
+    } catch (error) {
+      console.error("Error:", error);
     }
   };
 

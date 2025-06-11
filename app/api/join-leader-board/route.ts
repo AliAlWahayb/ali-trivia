@@ -1,4 +1,4 @@
-// app/api/update-score/route.ts
+// app/api/join-leader-board/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { triggerEvent } from '@/lib/pusherServer';
 import { verifyToken } from '@/lib/jwt';
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const token = cookieStore.get('token')?.value;
     const payload = token ? verifyToken(token) : null;
 
-    if (!payload || payload.role !== 'admin') {
+    if (!payload || payload.role !== 'player') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -33,23 +33,14 @@ export async function POST(request: NextRequest) {
       leaderboard[roomId] = [];
     }
 
-    if (leaderboard[roomId].length === 0) {
-      return NextResponse.json({ error: 'Leaderboard is empty' }, { status: 400 });
-    }
-
-    // Check if the player is not in the leaderboard
-    if (!leaderboard[roomId].includes(player)) {
-      return NextResponse.json({ error: 'Player not in the leaderboard' }, { status: 400 });
+    // Check if the player is already in the leaderboard
+    if (leaderboard[roomId].includes(player)) {
+      return NextResponse.json({ error: 'Player already in the leaderboard' }, { status: 400 });
     }
 
 
-    // update the player's score
-    leaderboard[roomId] = leaderboard[roomId].map((p) => {
-      if (p.player === player) {
-        return { ...p, score: p.score + 1 };
-      }
-      return p;
-    });
+    // Add the player to the leaderboard and set their score to 0
+    leaderboard[roomId].push({ player, score: 0 });
 
 
 
@@ -63,7 +54,7 @@ export async function POST(request: NextRequest) {
       queue: leaderboard[roomId],
     });
   } catch (error) {
-    console.error('Error in update-score API:', error);
+    console.error('Error in join-leader-board API:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

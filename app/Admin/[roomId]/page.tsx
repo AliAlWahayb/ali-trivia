@@ -22,9 +22,9 @@ export default async function Room({ params }: { params: { roomId: string } }) {
         Your Room ID: <span className="font-bold text-lg">{roomId}</span>
       </div>
       <div className="flex flex-col items-center w-full max-w-3xl space-y-3">
-        <QuestionsCard />
-        <AdminAccordion />
-        <Queue />
+        <QuestionsCard roomId={roomId} />
+        <AdminAccordion roomId={roomId} />
+        <Queue roomId={roomId} />
       </div>
     </div>
   );

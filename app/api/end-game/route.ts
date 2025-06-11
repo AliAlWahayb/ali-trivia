@@ -1,6 +1,5 @@
-// app/api/update-score/route.ts
+// app/api/end-game/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { triggerEvent } from '@/lib/pusherServer';
 import { verifyToken } from '@/lib/jwt';
 import { cookies } from 'next/headers';
 import { leaderboard } from '@/lib/roomQueues';
@@ -21,49 +20,42 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { roomId, player } = body;
+    const { roomId } = body;
 
     // Ensure the data is correct
     if (!roomId) {
       return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
     }
 
-    // initialize the leaderboard if it doesn't exist for the roomId
     if (!leaderboard[roomId]) {
-      leaderboard[roomId] = [];
+      return NextResponse.json({ error: 'Leaderboard not found' }, { status: 400 });
     }
 
     if (leaderboard[roomId].length === 0) {
       return NextResponse.json({ error: 'Leaderboard is empty' }, { status: 400 });
     }
 
-    // Check if the player is not in the leaderboard
-    if (!leaderboard[roomId].includes(player)) {
-      return NextResponse.json({ error: 'Player not in the leaderboard' }, { status: 400 });
-    }
-
-
-    // update the player's score
-    leaderboard[roomId] = leaderboard[roomId].map((p) => {
-      if (p.player === player) {
-        return { ...p, score: p.score + 1 };
-      }
-      return p;
-    });
+    const topScorePlayer = leaderboard[roomId].length > 0
+      ? leaderboard[roomId].reduce((max, current) => {
+        return current.score > max.score ? current : max;
+      }, leaderboard[roomId][0])
+      : null;
 
 
 
-    // Trigger the 'buzzer-queue' event to notify others
-    await triggerEvent(`room-${roomId}`, 'leader-board', leaderboard[roomId]);
-    console.log(`Leaderboard updated for room ${roomId}`);
-    console.log(leaderboard[roomId]);
+    // // Trigger the 'buzzer-queue' event to notify others
+    // await triggerEvent(`room-${roomId}`, 'leader-board', leaderboard[roomId]);
+    // console.log(`Leaderboard updated for room ${roomId}`);
+    // console.log(leaderboard[roomId]);
+
+    console.log('Top score player:', topScorePlayer);
 
     return NextResponse.json({
       success: true,
-      queue: leaderboard[roomId],
+      topScorePlayer
     });
   } catch (error) {
-    console.error('Error in update-score API:', error);
+    console.error('Error in end game API:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

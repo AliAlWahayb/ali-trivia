@@ -1,4 +1,4 @@
-// app/api/update-score/route.ts
+// app/api/kick-player/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { triggerEvent } from '@/lib/pusherServer';
 import { verifyToken } from '@/lib/jwt';
@@ -28,14 +28,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
     }
 
-    // initialize the leaderboard if it doesn't exist for the roomId
-    if (!leaderboard[roomId]) {
-      leaderboard[roomId] = [];
-    }
-
-    if (leaderboard[roomId].length === 0) {
-      return NextResponse.json({ error: 'Leaderboard is empty' }, { status: 400 });
-    }
 
     // Check if the player is not in the leaderboard
     if (!leaderboard[roomId].includes(player)) {
@@ -43,13 +35,8 @@ export async function POST(request: NextRequest) {
     }
 
 
-    // update the player's score
-    leaderboard[roomId] = leaderboard[roomId].map((p) => {
-      if (p.player === player) {
-        return { ...p, score: p.score + 1 };
-      }
-      return p;
-    });
+    // Remove the player from the leaderboard
+    leaderboard[roomId] = leaderboard[roomId].filter((p) => p !== player);
 
 
 
@@ -63,7 +50,7 @@ export async function POST(request: NextRequest) {
       queue: leaderboard[roomId],
     });
   } catch (error) {
-    console.error('Error in update-score API:', error);
+    console.error('Error in kick player API:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

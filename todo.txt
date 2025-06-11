@@ -1,0 +1,3 @@
+make sure the room id is uniqe
+make sure the player is not already in the leaderboard if so dont redirect user this is the same as check duplication
+fix      setPlayers(data.map((player) => JSON.parse(player)));
