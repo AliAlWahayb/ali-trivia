@@ -33,7 +33,7 @@ const AdminAccordion = ({ roomId }: Props) => {
   const handleList = useCallback((data: string[]) => {
     try {
       console.log("leaderboard received:", data); // Debug log
-      setPlayers(data.map((player) => JSON.parse(player)));
+      setPlayers(data);
     } catch (err) {
       console.error("Error handling players:", err);
       setError("Failed to get player status");

@@ -1,3 +1,6 @@
-make sure the room id is uniqe
-make sure the player is not already in the leaderboard if so dont redirect user this is the same as check duplication
-fix      setPlayers(data.map((player) => JSON.parse(player)));
+make sure the room id is uniqe:Done
+make sure the player is not already in the leaderboard if so dont redirect user this is the same as check duplication:Done
+fix      setPlayers(data.map((player) => JSON.parse(player)));:Done
+add kick to player room if player not in leaderboard redirect user to home page:done
+when a player buzz in make the count down timer start:already done
+empty array after the game is over:Done

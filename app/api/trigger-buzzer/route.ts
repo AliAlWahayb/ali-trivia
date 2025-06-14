@@ -28,9 +28,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
     }
 
-    // Initialize the queue if it doesn't exist for the roomId
+    // Check if the queue exists
     if (!roomQueues[roomId]) {
-      roomQueues[roomId] = [];
+      return NextResponse.json({ error: 'Queue not found' }, { status: 400 });
     }
 
     // Check if the player is already in the queue

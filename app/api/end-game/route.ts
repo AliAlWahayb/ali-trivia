@@ -34,13 +34,16 @@ export async function POST(request: NextRequest) {
     if (leaderboard[roomId].length === 0) {
       return NextResponse.json({ error: 'Leaderboard is empty' }, { status: 400 });
     }
-
+    
     const topScorePlayer = leaderboard[roomId].length > 0
       ? leaderboard[roomId].reduce((max, current) => {
         return current.score > max.score ? current : max;
       }, leaderboard[roomId][0])
       : null;
 
+    // Delete the leaderboard and queue for the room
+    delete leaderboard[roomId];
+    delete roomQueues[roomId];
 
 
     // // Trigger the 'buzzer-queue' event to notify others

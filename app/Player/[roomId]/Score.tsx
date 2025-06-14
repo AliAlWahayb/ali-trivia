@@ -2,6 +2,7 @@
 import { usePusherBind } from "@/hooks/usePusherBind";
 import { usePusherSubscribe } from "@/hooks/usePusherSubscribe";
 import { useCallback, useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface Player {
   roomId: string;
@@ -11,6 +12,8 @@ interface Player {
 export default function Score({ roomId, username }: Player) {
   const [score, setScore] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
+
+  const router = useRouter();
 
   const channelName = `room-${roomId}`;
   const { channel, error: pusherError } = usePusherSubscribe(channelName);
@@ -25,13 +28,14 @@ export default function Score({ roomId, username }: Player) {
           setScore(playerData.score); // Update score based on player data
         } else {
           setError("Player not found in leaderboard");
+          router.push("/");
         }
       } catch (err) {
         console.error("Error handling players:", err);
         setError("Failed to get player status");
       }
     },
-    [username]
+    [router, username]
   );
 
   usePusherBind(channel, "leader-board", handleList);

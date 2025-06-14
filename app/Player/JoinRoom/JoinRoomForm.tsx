@@ -38,25 +38,7 @@ export default function JoinRoomForm() {
 
       console.log("Joined room successfully:", roomResult);
 
-      // 2. Join Leaderboard API Request
-      const leaderBoardRes = await fetch("/api/join-leader-board", {
-        method: "POST",
-        body: JSON.stringify({
-          roomId: roomResult.roomId,
-          player: data.name,
-        }),
-        headers: { "Content-Type": "application/json" },
-      });
-      const leaderBoardResult = await leaderBoardRes.json();
-
-      if (leaderBoardResult.error) {
-        console.error("Error adding to leaderboard:", leaderBoardResult.error);
-        return;
-      }
-
-      console.log("Player added to leaderboard:", leaderBoardResult);
-
-      // 3. Redirect to the player's room
+      // 2. Redirect to the player's room
       router.push(`/Player/${roomResult.roomId}`);
     } catch (error) {
       console.error("Error:", error);

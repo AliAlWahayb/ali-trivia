@@ -1,29 +1,29 @@
 "use client";
+
 import { usePusherBind } from "@/hooks/usePusherBind";
 import { usePusherSubscribe } from "@/hooks/usePusherSubscribe";
 import { useCallback, useState } from "react";
+
+interface Player {
+  player: string;
+  score: number;
+}
 
 interface Props {
   roomId: string;
 }
 
-interface Player {
-  name: string;
-  score: number;
-}
-
 const Players = ({ roomId }: Props) => {
   const [error, setError] = useState<string | null>(null);
-
   const channelName = `room-${roomId}`;
   const { channel, error: pusherError } = usePusherSubscribe(channelName);
 
   const [players, setPlayers] = useState<Player[]>([]);
 
-  const handleList = useCallback((data: string[]) => {
+  const handleList = useCallback((data: Player[]) => {
     try {
       console.log("leaderboard received:", data); // Debug log
-      setPlayers(data.map((player) => JSON.parse(player)));
+      setPlayers(data);
     } catch (err) {
       console.error("Error handling players:", err);
       setError("Failed to get player status");
@@ -69,10 +69,10 @@ const Players = ({ roomId }: Props) => {
       {sortedPlayers.length > 0 ? (
         sortedPlayers.map((player, idx) => (
           <div
-            key={player.name + idx}
+            key={player.player + idx}
             className="flex justify-between text-lg items-center mb-2 pb-1 border-b border-gray-300 w-full px-5"
           >
-            <p className="text-text-primary font-semibold">{player.name}</p>
+            <p className="text-text-primary font-semibold">{player.player}</p>
             <p className="text-secondary font-semibold">{player.score}</p>
           </div>
         ))

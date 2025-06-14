@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     const token = signToken({
         role: "spectator",
         roomId,
-    });
+    }, { expiresIn: "1h" });
 
     const response = NextResponse.json({ success: true, roomId });
     response.headers.set("Set-Cookie", `token=${token}; HttpOnly; Path=/; Max-Age=3600`);

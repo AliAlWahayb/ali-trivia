@@ -28,9 +28,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
     }
 
-    // initialize the leaderboard if it doesn't exist for the roomId
+    // Check if the leaderboard exists
     if (!leaderboard[roomId]) {
-      leaderboard[roomId] = [];
+      return NextResponse.json({ error: 'Leaderboard not found' }, { status: 400 });
     }
 
     if (leaderboard[roomId].length === 0) {
