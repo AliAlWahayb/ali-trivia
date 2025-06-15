@@ -3,12 +3,15 @@
 import { useForm, FormProvider } from "react-hook-form";
 import TextInput from "@/components/TextInput";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface JoinLeaderBoardFormData {
   roomCode: string;
 }
 
 export default function JoinLeaderBoardForm() {
+  const [error, setError] = useState<string | null>(null);
+
   const methods = useForm<JoinLeaderBoardFormData>({
     defaultValues: {
       roomCode: "",
@@ -28,6 +31,12 @@ export default function JoinLeaderBoardForm() {
       body: formData,
     });
     const result = await res.json();
+
+    if (result.error) {
+      console.error("Error joining room:", result.error);
+      setError(result.error);
+      return;
+    }
     if (result.roomId) {
       console.log("Joined room successfully:", result);
       router.push(`/LeaderBoard/${result.roomId}`);
@@ -44,11 +53,38 @@ export default function JoinLeaderBoardForm() {
             id="roomCode"
             placeholder="Enter Room Code"
             inputMode="numeric"
-            type="number"
+            type="text"
+            maxLength={4}
+            minLength={4}
+            pattern="\d*"
             required
-            {...register("roomCode")}
+            {...register("roomCode", {
+              required: true,
+              pattern: {
+                value: /^\d{4}$/,
+                message: "Room code must be exactly 4 digits",
+              },
+              validate: (value) =>
+                value.length === 4 || "Room code must be exactly 4 digits",
+            })}
+            onInput={(e) => {
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-expect-error
+              e.target.value = e.target.value.replace(/[^0-9]/g, "");
+            }}
           />
 
+          {error && (
+            <div className="bg-red-500 text-white p-2 text-center">
+              {error}
+              <button
+                onClick={() => setError(null)}
+                className="ml-2 text-xs underline"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
           {/* Submit Button */}
           <button
             type="submit"

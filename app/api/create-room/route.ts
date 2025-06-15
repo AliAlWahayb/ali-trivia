@@ -19,7 +19,7 @@ export async function POST() {
         role: "admin",
         username,
         roomId,
-    }, { expiresIn: "1h" });
+    });
 
     const response = NextResponse.json({ success: true, roomId });
     response.headers.set("Set-Cookie", `token=${token}; HttpOnly; Path=/; Max-Age=3600`);

@@ -51,7 +51,11 @@ export default function QuestionsCard({ roomId }: Props) {
     setTimerKey((k) => k + 1); // Change key to force remount
   };
 
-
+  //handler to stop the countdown
+  const stopCountdown = () => {
+    setTargetDate(null);
+    setTimerKey((k) => k + 1); // Change key to force remount
+  };
 
   const [topQueue, setTopQueue] = useState<string>("");
   const handleQueue = useCallback((data: string[]) => {
@@ -59,6 +63,7 @@ export default function QuestionsCard({ roomId }: Props) {
       console.log("Queue update received:", data); // Debug log
       if (!data || data.length === 0) {
         setTopQueue("");
+        stopCountdown();
       } else {
         setTopQueue(data[0]);
         startCountdown();
@@ -73,9 +78,6 @@ export default function QuestionsCard({ roomId }: Props) {
 
   const handelCorrectAnswer = async () => {
     if (correctIsLoading) return;
-
-    setRound(Round + 1);
-    setShouldRestart(false);
 
     try {
       setCorrectIsLoading(true);
@@ -98,6 +100,9 @@ export default function QuestionsCard({ roomId }: Props) {
         throw new Error(data.error || "Failed to update score");
       }
 
+      setRound(Round + 1);
+      setShouldRestart(false);
+
       console.log("updated score successfully");
     } catch (error) {
       console.error("Error updating score:", error);
@@ -108,7 +113,6 @@ export default function QuestionsCard({ roomId }: Props) {
       setCorrectIsLoading(false);
     }
   };
-
 
   const handleWrongAnswer = async () => {
     if (wrongIsLoading) return;
@@ -138,10 +142,11 @@ export default function QuestionsCard({ roomId }: Props) {
       console.log("popped queue successfully");
     } catch (error) {
       console.error("Error popping queue:", error);
-      setError(
-        error instanceof Error ? error.message : "Failed to pop queue"
-      );
+      setError(error instanceof Error ? error.message : "Failed to pop queue");
     } finally {
+      if (topQueue === "") {
+        stopCountdown();
+      }
       setWrongIsLoading(false);
     }
   };
@@ -149,7 +154,6 @@ export default function QuestionsCard({ roomId }: Props) {
   const handleSkip = async () => {
     if (skiptIsLoading) return;
 
-    
     setShouldRestart(false);
 
     try {
@@ -179,6 +183,7 @@ export default function QuestionsCard({ roomId }: Props) {
         error instanceof Error ? error.message : "Failed to empty queue"
       );
     } finally {
+      stopCountdown();
       setSkiptIsLoading(false);
     }
   };
@@ -268,10 +273,11 @@ export default function QuestionsCard({ roomId }: Props) {
           >
             Wrong Answer
           </button>
-          <button 
-          disabled={skiptIsLoading}
-          onClick={handleSkip}
-          className="w-full bg-warning text-white font-semibold py-2 rounded-lg  hover:bg-primary hover:text-white transition duration-300 transform active:scale-95">
+          <button
+            disabled={skiptIsLoading}
+            onClick={handleSkip}
+            className="w-full bg-warning text-white font-semibold py-2 rounded-lg  hover:bg-primary hover:text-white transition duration-300 transform active:scale-95"
+          >
             Skip Question
           </button>
         </div>

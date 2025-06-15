@@ -3,14 +3,12 @@
 
 import { usePusherBind } from "@/hooks/usePusherBind";
 import { usePusherSubscribe } from "@/hooks/usePusherSubscribe";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 interface Player {
   roomId: string;
   username: string;
 }
-
-
 
 export default function Buzzer({ roomId, username }: Player) {
   const [buzzedIn, setBuzzedIn] = useState(false);
@@ -18,27 +16,71 @@ export default function Buzzer({ roomId, username }: Player) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch the queue data when the component mounts
+  useEffect(() => {
+    const fetchQueue = async () => {
+      try {
+        const response = await fetch("/api/get-queue", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            roomId: roomId,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success && Array.isArray(data.queue)) {
+          if (data.queue.includes(username)) {
+            setBuzzedIn(true);
+            if (data.queue[0] === username) {
+              setYourTurn(true);
+            }
+          }
+        }
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to get queue");
+        }
+
+        console.log("got queue successfully");
+        console.log(data);
+      } catch (error) {
+        console.error("Error getting queue:", error);
+        setError(
+          error instanceof Error ? error.message : "Failed to get queue"
+        );
+      }
+    };
+    fetchQueue();
+  }, [roomId, username]);
+
   const channelName = `room-${roomId}`;
   const { channel, error: pusherError } = usePusherSubscribe(channelName);
 
-  const handleQueueUpdate = useCallback((data: string[]) => {
-    try {
-      console.log('Queue update received:', data); // Debug log
-      if (!data || data.length === 0) {
-        setBuzzedIn(false);
-        setYourTurn(false);
-      } else if (data[0] === username) {
-        setYourTurn(true);
-        setBuzzedIn(true);
-      } else {
-        setYourTurn(false);
-        setBuzzedIn(true);
+  const handleQueueUpdate = useCallback(
+    (data: string[]) => {
+      try {
+        console.log("Queue update received:", data); // Debug log
+        if (!data || data.length === 0) {
+          setBuzzedIn(false);
+          setYourTurn(false);
+        } else if (data[0] === username) {
+          setYourTurn(true);
+          setBuzzedIn(true);
+        } else {
+          setYourTurn(false);
+          setBuzzedIn(true);
+        }
+      } catch (err) {
+        console.error("Error handling queue update:", err);
+        setError("Failed to update queue status");
       }
-    } catch (err) {
-      console.error('Error handling queue update:', err);
-      setError('Failed to update queue status');
-    }
-  }, [username]);
+    },
+    [username]
+  );
 
   usePusherBind(channel, "buzzer-queue", handleQueueUpdate);
 
@@ -63,14 +105,14 @@ export default function Buzzer({ roomId, username }: Player) {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to buzz in');
+        throw new Error(data.error || "Failed to buzz in");
       }
 
       console.log("Buzzed in successfully");
       setBuzzedIn(true);
     } catch (error) {
       console.error("Error buzzing in:", error);
-      setError(error instanceof Error ? error.message : 'Failed to buzz in');
+      setError(error instanceof Error ? error.message : "Failed to buzz in");
     } finally {
       setIsLoading(false);
     }
@@ -111,11 +153,23 @@ export default function Buzzer({ roomId, username }: Player) {
         disabled={buzzedIn || isLoading || !channel}
         onClick={handleBuzzIn}
         className={`flex-1 w-full h-full text-white text-5xl text-center font-semibold rounded-lg transition duration-300 transform active:scale-95 ${
-          buzzedIn ? (yourTurn ? "bg-green-500" : "bg-yellow-500") : "bg-blue-500"
+          buzzedIn
+            ? yourTurn
+              ? "bg-green-500"
+              : "bg-yellow-500"
+            : "bg-blue-500"
         } hover:bg-blue-600 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed`}
         style={{ minHeight: "100%" }}
       >
-        {!channel ? "Connecting..." : isLoading ? "Buzzing..." : buzzedIn ? (yourTurn ? "Your Turn" : "Waiting...") : "Buzz In"}
+        {!channel
+          ? "Connecting..."
+          : isLoading
+          ? "Buzzing..."
+          : buzzedIn
+          ? yourTurn
+            ? "Your Turn"
+            : "Waiting..."
+          : "Buzz In"}
       </button>
     </div>
   );

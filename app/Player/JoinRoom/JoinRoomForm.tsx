@@ -3,6 +3,7 @@
 import { useForm, FormProvider } from "react-hook-form";
 import TextInput from "@/components/TextInput";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface JoinRoomFormData {
   roomCode: string;
@@ -10,6 +11,8 @@ interface JoinRoomFormData {
 }
 
 export default function JoinRoomForm() {
+  const [error, setError] = useState<string | null>(null);
+
   const methods = useForm<JoinRoomFormData>({
     defaultValues: {
       roomCode: "",
@@ -30,15 +33,18 @@ export default function JoinRoomForm() {
         body: formData,
       });
       const roomResult = await roomRes.json();
+      console.log(roomResult);
 
       if (roomResult.error) {
         console.error("Error joining room:", roomResult.error);
+        setError(roomResult.error);
         return;
       }
 
       console.log("Joined room successfully:", roomResult);
 
       // 2. Redirect to the player's room
+
       router.push(`/Player/${roomResult.roomId}`);
     } catch (error) {
       console.error("Error:", error);
@@ -88,6 +94,18 @@ export default function JoinRoomForm() {
             required
             {...register("name")}
           />
+
+          {error && (
+            <div className="bg-red-500 text-white p-2 text-center">
+              {error}
+              <button
+                onClick={() => setError(null)}
+                className="ml-2 text-xs underline"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
 
           {/* Submit Button */}
           <button

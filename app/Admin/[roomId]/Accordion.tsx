@@ -4,16 +4,17 @@ import { usePusherBind } from "@/hooks/usePusherBind";
 import { usePusherSubscribe } from "@/hooks/usePusherSubscribe";
 import * as Accordion from "@radix-ui/react-accordion";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
+import { AutoTextSize } from "auto-text-size";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface Props {
   roomId: string;
 }
 
 interface Player {
-  name: string;
-  Score: number;
+  player: string;
+  score: number;
 }
 
 const AdminAccordion = ({ roomId }: Props) => {
@@ -27,10 +28,70 @@ const AdminAccordion = ({ roomId }: Props) => {
 
   const router = useRouter();
 
+  // Fetch the leaderboard data when the component mounts
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        const response = await fetch("/api/get-leader-board", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            roomId: roomId,
+          }),
+        });
+
+        const data = await response.json();
+        if (data.leaderboard.length > 0) {
+          setPlayers(data.leaderboard);
+        }
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to get leaderboard");
+        }
+
+        console.log("got leaderboard successfully");
+        console.log(data);
+      } catch (error) {
+        console.error("Error getting leaderboard:", error);
+        setError(
+          error instanceof Error ? error.message : "Failed to get leaderboard"
+        );
+      }
+    };
+    fetchLeaderboard();
+  }, [roomId]);
+
   const channelName = `room-${roomId}`;
   const { channel, error: pusherError } = usePusherSubscribe(channelName);
 
-  const handleList = useCallback((data: string[]) => {
+  //handle game end
+  const handelGameEnd = useCallback(
+    async (data: string) => {
+      try {
+        console.log("game ended", data);
+
+        document.cookie = "token=; Max-Age=0; path=/";
+
+        localStorage.removeItem("roomId");
+        sessionStorage.clear();
+
+        // Wait for 1 minutes before redirecting
+        setTimeout(() => {
+          router.push(`/`);
+        }, 60000);
+      } catch (err) {
+        console.error("Error ending game:", err);
+        setError("Failed to end game");
+      }
+    },
+    [router]
+  );
+
+  usePusherBind(channel, "end-game", handelGameEnd);
+
+  const handleList = useCallback((data: Player[]) => {
     try {
       console.log("leaderboard received:", data); // Debug log
       setPlayers(data);
@@ -44,10 +105,10 @@ const AdminAccordion = ({ roomId }: Props) => {
 
   // Sort players alphabetically by name
   const sortedPlayers = [...players].sort((a, b) =>
-    a.name.localeCompare(b.name)
+    a.player.localeCompare(b.player)
   );
 
-  const handelKick = async (name: string) => {
+  const handelKick = async (player: string) => {
     if (kickIsLoading) return;
 
     try {
@@ -60,7 +121,7 @@ const AdminAccordion = ({ roomId }: Props) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          player: name,
+          player: player,
           roomId: roomId,
         }),
       });
@@ -136,13 +197,15 @@ const AdminAccordion = ({ roomId }: Props) => {
   // end game
   if (topScorePlayer) {
     return (
-      <div className="flex flex-col min-h-screen w-full h-full bg-red-100 p-4 items-center justify-center">
-        <div className="bg-red-500 text-white p-4 rounded-lg text-center max-w-md">
-          <h3 className="font-bold mb-2">Game has ended</h3>
-          <p className="mb-4">{topScorePlayer.name}</p>
+      <div className="flex flex-col  w-full h-full bg-secondary rounded-lg  p-4 items-center ">
+        <div className="bg-secondary text-white p-4 rounded-lg text-center max-w-md">
+          <h3 className="font-bold mb-2 capitalize">Game has ended</h3>
+          <p className="mb-4 capitalize">
+            the winner is: {topScorePlayer.player}
+          </p>
           <button
             onClick={() => router.push("/")}
-            className="bg-white text-red-500 px-4 py-2 rounded hover:bg-gray-100"
+            className="bg-white text-text-primary px-4 py-2 rounded hover:bg-gray-100"
           >
             Go Home
           </button>
@@ -194,30 +257,51 @@ const AdminAccordion = ({ roomId }: Props) => {
                 checked={CloseRoom}
               />
               <div>
-                <div className="flex justify-between items-center mb-2  pb-1">
-                  <p className="text-text-primary  font-semibold">Name</p>
-                  <p className="text-text-primary font-semibold">Score</p>
-                  <button className="text-text-primary font-semibold">
+                {/* Header row for labels */}
+                <div className="grid grid-cols-3 gap-4 mb-2 pb-1">
+                  <p className="text-text-primary font-semibold text-center">
+                    Name
+                  </p>
+                  <p className="text-text-primary font-semibold text-center">
+                    Score
+                  </p>
+                  <p className="text-text-primary font-semibold text-center">
                     Action
-                  </button>
+                  </p>
                 </div>
+
                 {sortedPlayers.map((player, idx) => (
                   <div
-                    key={player.name + idx}
-                    className="flex justify-between items-center mb-2 border-b border-gray-300 pb-1"
+                    key={player.player + idx}
+                    className="grid grid-cols-3 gap-4 mb-2 border-b border-gray-300 pb-1"
                   >
-                    <p className="text-text-primary ">{player.name}</p>
-                    <p className="text-text-primary">{player.Score}</p>
-                    <button
-                      disabled={kickIsLoading}
-                      onClick={() => handelKick(player.name)}
-                      className=" bg-danger text-white font-semibold px-2 py-0.5 rounded-lg  hover:bg-primary hover:text-white transition duration-300 transform active:scale-95"
-                    >
-                      Kick
-                    </button>
+                    <div className="flex items-center justify-center">
+                      <AutoTextSize
+                        mode="oneline"
+                        maxFontSizePx={36}
+                        className="w-full text-center text-text-primary font-semibold"
+                      >
+                        {player.player}
+                      </AutoTextSize>
+                    </div>
+
+                    <p className="text-secondary text-center font-semibold">
+                      {player.score}
+                    </p>
+
+                    <div className="flex items-center justify-center">
+                      <button
+                        disabled={kickIsLoading}
+                        onClick={() => handelKick(player.player)}
+                        className="bg-danger text-white font-semibold px-2 py-0.5 rounded-lg hover:bg-primary hover:text-white transition duration-300 transform active:scale-95"
+                      >
+                        Kick
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
+
               <div className=" text-center mt-4">
                 <button
                   onClick={() => handelEnd()}

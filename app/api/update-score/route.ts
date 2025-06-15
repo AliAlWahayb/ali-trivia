@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { triggerEvent } from '@/lib/pusherServer';
 import { verifyToken } from '@/lib/jwt';
 import { cookies } from 'next/headers';
-import { leaderboard } from '@/lib/roomQueues';
+import { leaderboard, roomQueues } from '@/lib/roomQueues';
 
 
 
@@ -28,6 +28,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
     }
 
+    if (!player) {
+      return NextResponse.json({ error: 'Queue is empty' }, { status: 400 });
+    }
+
     // Check if the leaderboard exists
     if (!leaderboard[roomId]) {
       return NextResponse.json({ error: 'Leaderboard not found' }, { status: 400 });
@@ -37,8 +41,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Leaderboard is empty' }, { status: 400 });
     }
 
-    // Check if the player is not in the leaderboard
-    if (!leaderboard[roomId].includes(player)) {
+    // Check if the player is in the leaderboard
+    const playerInLeaderboard = leaderboard[roomId].find((p) => p.player === player);
+
+    if (!playerInLeaderboard) {
       return NextResponse.json({ error: 'Player not in the leaderboard' }, { status: 400 });
     }
 
@@ -51,9 +57,15 @@ export async function POST(request: NextRequest) {
       return p;
     });
 
-
+    // empty the queue
+    roomQueues[roomId] = [];
 
     // Trigger the 'buzzer-queue' event to notify others
+    await triggerEvent(`room-${roomId}`, 'buzzer-queue', roomQueues[roomId]);
+    console.log(`queue emptyed for room ${roomId}`);
+    console.log(roomQueues[roomId]);
+
+    // Trigger the 'leader-board' event to notify others
     await triggerEvent(`room-${roomId}`, 'leader-board', leaderboard[roomId]);
     console.log(`Leaderboard updated for room ${roomId}`);
     console.log(leaderboard[roomId]);

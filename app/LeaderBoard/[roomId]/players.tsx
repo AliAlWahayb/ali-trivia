@@ -2,7 +2,9 @@
 
 import { usePusherBind } from "@/hooks/usePusherBind";
 import { usePusherSubscribe } from "@/hooks/usePusherSubscribe";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { AutoTextSize } from "auto-text-size";
 
 interface Player {
   player: string;
@@ -14,11 +16,47 @@ interface Props {
 }
 
 const Players = ({ roomId }: Props) => {
+  const router = useRouter();
+
   const [error, setError] = useState<string | null>(null);
   const channelName = `room-${roomId}`;
   const { channel, error: pusherError } = usePusherSubscribe(channelName);
 
   const [players, setPlayers] = useState<Player[]>([]);
+
+  // Fetch the leaderboard data when the component mounts
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        const response = await fetch("/api/get-leader-board", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            roomId: roomId,
+          }),
+        });
+
+        const data = await response.json();
+        if (data.leaderboard.length > 0) {
+          setPlayers(data.leaderboard);
+        }
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to get leaderboard");
+        }
+
+        console.log("got leaderboard successfully");
+      } catch (error) {
+        console.error("Error getting leaderboard:", error);
+        setError(
+          error instanceof Error ? error.message : "Failed to get leaderboard"
+        );
+      }
+    };
+    fetchLeaderboard();
+  }, [roomId]);
 
   const handleList = useCallback((data: Player[]) => {
     try {
@@ -31,6 +69,31 @@ const Players = ({ roomId }: Props) => {
   }, []);
 
   usePusherBind(channel, "leader-board", handleList);
+
+  //handle game end
+  const handelGameEnd = useCallback(
+    async (data: string) => {
+      try {
+        console.log("game ended", data);
+
+        document.cookie = "token=; Max-Age=0; path=/";
+
+        localStorage.removeItem("roomId");
+        sessionStorage.clear();
+
+        // Wait for 1 minutes before redirecting
+        setTimeout(() => {
+          router.push(`/`);
+        }, 60000);
+      } catch (err) {
+        console.error("Error ending game:", err);
+        setError("Failed to end game");
+      }
+    },
+    [router]
+  );
+
+  usePusherBind(channel, "end-game", handelGameEnd);
 
   // Sort by Score descending
   const sortedPlayers = players.sort((a, b) => b.score - a.score);
@@ -54,7 +117,7 @@ const Players = ({ roomId }: Props) => {
   }
 
   return (
-    <div className="">
+    <div className=" w-full h-full">
       {error && (
         <div className="bg-red-500 text-white p-2 text-center">
           {error}
@@ -72,8 +135,20 @@ const Players = ({ roomId }: Props) => {
             key={player.player + idx}
             className="flex justify-between text-lg items-center mb-2 pb-1 border-b border-gray-300 w-full px-5"
           >
-            <p className="text-text-primary font-semibold">{player.player}</p>
-            <p className="text-secondary font-semibold">{player.score}</p>
+
+            <div className="w-2/3 text-center">
+              <AutoTextSize
+                mode="multiline"
+                maxFontSizePx={16}
+                className="w-full text-start truncate text-text-primary font-semibold" 
+              >
+                {player.player}
+              </AutoTextSize>
+            </div>
+
+            <p className="w-1/3 text-end pe-4 text-secondary font-semibold">
+              {player.score}
+            </p>
           </div>
         ))
       ) : (

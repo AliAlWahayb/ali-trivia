@@ -3,14 +3,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { triggerEvent } from '@/lib/pusherServer';
 import { verifyToken } from '@/lib/jwt';
 import { cookies } from 'next/headers';
-import { roomQueues } from '@/lib/roomQueues';  // Import shared roomQueues
+import { leaderboard, roomQueues } from '@/lib/roomQueues';  // Import shared roomQueues
 
 
 
 
 export async function POST(request: NextRequest) {
   try {
-     // Get token from cookies instead of Authorization header
+    // Get token from cookies instead of Authorization header
 
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
@@ -22,6 +22,8 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const { roomId, player } = body;
+    console.log(roomQueues);
+    console.log(body);
 
     // Ensure the data is correct
     if (!roomId || !player) {
@@ -37,7 +39,13 @@ export async function POST(request: NextRequest) {
     if (roomQueues[roomId].includes(player)) {
       return NextResponse.json({ error: 'Player already in the queue' }, { status: 400 });
     }
-    
+
+    // check if player not in leaderboard
+    if (!leaderboard[roomId].some(p => p.player === player)) {
+      return NextResponse.json({ error: 'Player not in the leaderboard' }, { status: 400 });
+    }
+
+
     // Add the player to the queue
     roomQueues[roomId].push(player);
 
@@ -45,7 +53,7 @@ export async function POST(request: NextRequest) {
     await triggerEvent(`room-${roomId}`, 'buzzer-queue', roomQueues[roomId]);
     console.log(`Triggered 'buzzer-queue' event for room ${roomId}`);
     console.log(roomQueues[roomId]);
-    
+
     return NextResponse.json({
       success: true,
       queue: roomQueues[roomId],

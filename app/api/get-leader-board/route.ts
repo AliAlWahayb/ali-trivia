@@ -1,6 +1,5 @@
-// app/api/kick-player/route.ts
+// app/api/trigger-buzzer/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { triggerEvent } from '@/lib/pusherServer';
 import { verifyToken } from '@/lib/jwt';
 import { cookies } from 'next/headers';
 import { leaderboard } from '@/lib/roomQueues';
@@ -16,43 +15,38 @@ export async function POST(request: NextRequest) {
     const token = cookieStore.get('token')?.value;
     const payload = token ? verifyToken(token) : null;
 
-    if (!payload || payload.role !== 'admin') {
+    if (!payload || (payload.role !== 'admin' && payload.role !== 'spectator')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
-    const { roomId, player } = body;
+    const { roomId } = body;
+
 
     // Ensure the data is correct
     if (!roomId) {
       return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
     }
 
-    // Check if the player is in the leaderboard
-    const playerInLeaderboard = leaderboard[roomId].find((p) => p.player === player);
-
-    if (!playerInLeaderboard) {
-      return NextResponse.json({ error: 'Player not in the leaderboard' }, { status: 400 });
+    // Check if the leaderboard exists
+    if (!leaderboard[roomId]) {
+      if (payload.role == 'admin') {
+        leaderboard[roomId] = [];
+      }
     }
 
 
-    // Remove the player from the leaderboard
-    leaderboard[roomId] = leaderboard[roomId].filter((p) => p.player !== player);
 
 
-
-
-    // Trigger the 'buzzer-queue' event to notify others
-    await triggerEvent(`room-${roomId}`, 'leader-board', leaderboard[roomId]);
-    console.log(`Leaderboard updated for room ${roomId}`);
+    console.log(`Leaderboard for room ${roomId}`);
     console.log(leaderboard[roomId]);
 
     return NextResponse.json({
       success: true,
-      queue: leaderboard[roomId],
+      leaderboard: leaderboard[roomId],
     });
   } catch (error) {
-    console.error('Error in kick player API:', error);
+    console.error('Error in getting leaderboard from API:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

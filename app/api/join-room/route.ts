@@ -18,7 +18,7 @@ export async function POST(request: Request) {
             role: "player",
             player,
             roomId,
-        }, { expiresIn: "1h" });
+        });
 
         // Check if the leaderboard exists for the roomId
         if (!leaderboard[roomId]) {

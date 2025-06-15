@@ -4,3 +4,21 @@ fix      setPlayers(data.map((player) => JSON.parse(player)));:Done
 add kick to player room if player not in leaderboard redirect user to home page:done
 when a player buzz in make the count down timer start:already done
 empty array after the game is over:Done
+
+
+leaderboard get request on join room not on player update:done not tested
+leaderboard check if room exists:done not tested
+correct answer gets Player not in the leaderboard while in leaderboard:done not tested
+wrong answer counter problems it dosent stop when quee empty and always restarts:done not tested
+skip dosent stops the counter but dosent restart:done not tested
+if player reload page and is in queue the button resets make it call the endpoint to get status:done not tested
+player kick gets Player not in the leaderboard:done not tested
+
+end game i get reponse but nothing happens :done
+player kick gets Player not in the leaderboard :done
+correct answer round update even when player not in queue:done
+correct answer dosent empty the queue:done
+add room not found error display:done
+cheak all inputs :done
+fix long text size :done
+kick update leaderboard :done

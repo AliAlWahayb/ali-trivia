@@ -1,7 +1,7 @@
 "use client";
 import { usePusherBind } from "@/hooks/usePusherBind";
 import { usePusherSubscribe } from "@/hooks/usePusherSubscribe";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface Props {
   roomId: string;
@@ -14,6 +14,43 @@ const Queue = ({ roomId }: Props) => {
   const { channel, error: pusherError } = usePusherSubscribe(channelName);
 
   const [queue, setQueue] = useState<string[]>([]);
+  
+
+  // Fetch the queue data when the component mounts
+  useEffect(() => {
+    const fetchQueue = async () => {
+      try {
+        const response = await fetch("/api/get-queue", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            roomId: roomId,
+          }),
+        });
+
+        const data = await response.json();
+        if (data.queue.length > 0) {
+          setQueue(data.queue);
+        }
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to get queue");
+        }
+
+        console.log("got queue successfully");
+        console.log(data.queue);
+      } catch (error) {
+        console.error("Error getting queue:", error);
+        setError(
+          error instanceof Error ? error.message : "Failed to get queue"
+        );
+      }
+    };
+    fetchQueue();
+  }, [roomId]);
+
   const handleQueue = useCallback((data: string[]) => {
     try {
       console.log("Queue update received:", data); // Debug log

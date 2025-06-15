@@ -10,6 +10,11 @@ export default async function Room({ params }: { params: { roomId: string } }) {
 
   const cookieStore = cookies();
   const token = (await cookieStore).get("token")?.value;
+
+  if (!token) {
+    redirect("/");
+  }
+
   const payload = token ? verifyToken(token) : null;
 
   if (!payload || payload.role !== "admin" || payload.roomId !== roomId) {

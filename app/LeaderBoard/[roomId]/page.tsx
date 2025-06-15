@@ -12,6 +12,11 @@ export default async function LeaderBoard({
   const { roomId } = await params;
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
+
+  if (!token) {
+    redirect("/");
+  }
+
   const payload = token ? verifyToken(token) : null;
 
   if (!payload || payload.role !== "spectator" || payload.roomId !== roomId) {
