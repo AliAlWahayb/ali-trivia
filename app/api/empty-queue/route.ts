@@ -10,7 +10,7 @@ import { roomQueues } from '@/lib/roomQueues';
 
 export async function POST(request: NextRequest) {
   try {
-        // Get token from cookies instead of Authorization header
+    // Get token from cookies instead of Authorization header
 
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     const { roomId } = body;
 
     // Ensure the data is correct
-    if (!roomId ) {
+    if (!roomId) {
       return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
     }
 
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     //   return NextResponse.json({ error: 'Queue is empty' }, { status: 400 });
     // }
 
-    
+
     // empty the queue
     roomQueues[roomId] = [];
 
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     await triggerEvent(`room-${roomId}`, 'buzzer-queue', roomQueues[roomId]);
     console.log(`queue emptyed for room ${roomId}`);
     console.log(roomQueues[roomId]);
-    
+
     return NextResponse.json({
       success: true,
       queue: roomQueues[roomId],

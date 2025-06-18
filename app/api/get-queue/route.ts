@@ -2,14 +2,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/jwt';
 import { cookies } from 'next/headers';
-import { roomQueues } from '@/lib/roomQueues'; 
+import { roomQueues } from '@/lib/roomQueues';
 
 
 
 
 export async function POST(request: NextRequest) {
   try {
-     // Get token from cookies instead of Authorization header
+    // Get token from cookies instead of Authorization header
 
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
 
     console.log(payload);
 
-    if (!payload || (payload.role !== 'admin' && payload.role !== 'player') ) {
+    if (!payload || (payload.role !== 'admin' && payload.role !== 'player')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -26,23 +26,21 @@ export async function POST(request: NextRequest) {
 
 
     // Ensure the data is correct
-    if (!roomId ) {
+    if (!roomId) {
       return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
     }
 
     // Check if the roomQueues exists
     if (!roomQueues[roomId]) {
-      if (payload.role == 'admin') {
-        roomQueues[roomId] = [];
-      }
+      roomQueues[roomId] = [];
     }
 
-    
-    
-    
+
+
+
     console.log(`Queue for room ${roomId}`);
     console.log(roomQueues[roomId]);
-    
+
     return NextResponse.json({
       success: true,
       queue: roomQueues[roomId],

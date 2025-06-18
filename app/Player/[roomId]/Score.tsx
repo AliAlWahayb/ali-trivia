@@ -28,10 +28,10 @@ export default function Score({ roomId, username }: Player) {
           setScore(playerData.score); // Update score based on player data
         } else {
           setError("Player got removed from room");
-          // Wait for 30 seconds before redirecting
+          // Wait for 7 seconds before redirecting
           setTimeout(() => {
             router.push(`/`);
-          }, 30000);
+          }, 7000);
         }
       } catch (err) {
         console.error("Error handling players:", err);
@@ -54,10 +54,12 @@ export default function Score({ roomId, username }: Player) {
         localStorage.removeItem("roomId");
         sessionStorage.clear();
 
-        // Wait for 1 minutes before redirecting
+        setError("Game ended. Redirecting to home...");
+
+        // Wait for 7 seconds before redirecting
         setTimeout(() => {
           router.push(`/`);
-        }, 60000);
+        }, 7000);
       } catch (err) {
         console.error("Error ending game:", err);
         setError("Failed to end game");

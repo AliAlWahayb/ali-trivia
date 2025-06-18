@@ -1,4 +1,4 @@
-// app/api/kick-player/route.ts
+// app/api/leave-player/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { triggerEvent } from '@/lib/pusherServer';
 import { verifyToken } from '@/lib/jwt';
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const token = cookieStore.get('token')?.value;
     const payload = token ? verifyToken(token) : null;
 
-    if (!payload || payload.role !== 'admin') {
+    if (!payload || payload.role !== 'player') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -26,6 +26,11 @@ export async function POST(request: NextRequest) {
     // Ensure the data is correct
     if (!roomId) {
       return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
+    }
+
+    // Check if the room exists in the leaderboard
+    if (!leaderboard[roomId]) {
+      return NextResponse.json({ error: 'Room not found' }, { status: 404 });
     }
 
     // Check if the player is in the leaderboard
@@ -39,7 +44,7 @@ export async function POST(request: NextRequest) {
     // Remove the player from the leaderboard
     leaderboard[roomId] = leaderboard[roomId].filter((p) => p.player !== player);
 
-    // Trigger the 'buzzer-queue' event to notify others
+    // Trigger the 'leader-board' event to notify others
     await triggerEvent(`room-${roomId}`, 'leader-board', leaderboard[roomId]);
     console.log(`Leaderboard updated for room ${roomId}`);
     console.log(leaderboard[roomId]);
@@ -56,12 +61,12 @@ export async function POST(request: NextRequest) {
     }
 
 
+
     return NextResponse.json({
       success: true,
-      queue: leaderboard[roomId],
     });
   } catch (error) {
-    console.error('Error in kick player API:', error);
+    console.error('Error in leave player API:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

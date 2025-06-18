@@ -22,3 +22,7 @@ add room not found error display:done
 cheak all inputs :done
 fix long text size :done
 kick update leaderboard :done
+
+
+sometimes the player counter dosent work
+add arabic support and make it default

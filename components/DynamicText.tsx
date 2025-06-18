@@ -12,10 +12,10 @@ const DynamicText = ({ text }: { text: string }) => {
 
   return (
     <h1
-      className="font-bold mb-3 text-text-primary"
+      className="font-bold  text-text-primary text-center "
       style={{ fontSize }}
     >
-      {text || "Player"}
+      {text || "Unknown Player"}
     </h1>
   );
 };

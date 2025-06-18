@@ -31,13 +31,14 @@ export default function Buzzer({ roomId, username }: Player) {
         });
 
         const data = await response.json();
-
+        console.log("Queue data:", data); // Debug log
         if (data.success && Array.isArray(data.queue)) {
           if (data.queue.includes(username)) {
             setBuzzedIn(true);
-            if (data.queue[0] === username) {
-              setYourTurn(true);
-            }
+            setYourTurn(data.queue[0] === username);
+          } else {
+            setBuzzedIn(false);
+            setYourTurn(false);
           }
         }
 
@@ -67,13 +68,20 @@ export default function Buzzer({ roomId, username }: Player) {
         if (!data || data.length === 0) {
           setBuzzedIn(false);
           setYourTurn(false);
-        } else if (data[0] === username) {
+          return;
+        }
+        if (!data.includes(username)) {
+          setBuzzedIn(false);
+          setYourTurn(false);
+          return;
+        }
+        if (data[0] === username) {
           setYourTurn(true);
           setBuzzedIn(true);
-        } else {
-          setYourTurn(false);
-          setBuzzedIn(true);
+          return;
         }
+        setYourTurn(false);
+        setBuzzedIn(true);
       } catch (err) {
         console.error("Error handling queue update:", err);
         setError("Failed to update queue status");
@@ -109,7 +117,9 @@ export default function Buzzer({ roomId, username }: Player) {
       }
 
       console.log("Buzzed in successfully");
-      setBuzzedIn(true);
+      setBuzzedIn(true); //makes the waiting state buggy, so we handle it in the queue update
+      setYourTurn(data.queue[0] === username);
+      console.log(data);
     } catch (error) {
       console.error("Error buzzing in:", error);
       setError(error instanceof Error ? error.message : "Failed to buzz in");
