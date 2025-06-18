@@ -1,5 +1,4 @@
 "use client";
-import ToggleSwitch from "@/components/ToggleSwitch";
 import { usePusherBind } from "@/hooks/usePusherBind";
 import { usePusherSubscribe } from "@/hooks/usePusherSubscribe";
 import * as Accordion from "@radix-ui/react-accordion";
@@ -19,7 +18,6 @@ interface Player {
 
 const AdminAccordion = ({ roomId }: Props) => {
   const [AccordionOpen, setAccordionOpen] = useState(false);
-  const [CloseRoom, setCloseRoom] = useState(false);
   const [players, setPlayers] = useState<Player[]>([]);
   const [kickIsLoading, setKickIsLoading] = useState(false);
   const [endIsLoading, setEndIsLoading] = useState(false);
@@ -249,13 +247,7 @@ const AdminAccordion = ({ roomId }: Props) => {
                   </button>
                 </div>
               )}
-              <ToggleSwitch
-                id="closeRoom"
-                label={`Close Room`}
-                className="mb-4"
-                onChange={(checked) => setCloseRoom(checked)}
-                checked={CloseRoom}
-              />
+              
               <div>
                 {/* Header row for labels */}
                 <div className="grid grid-cols-3 gap-4 mb-2 pb-1">

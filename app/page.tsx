@@ -1,3 +1,4 @@
+import CreateGame from "@/components/CreateGame";
 import Link from "next/link";
 
 export default function Home() {
@@ -26,12 +27,7 @@ export default function Home() {
         >
           Leaderboard
         </Link>
-        <Link
-          href="/Admin/CreateRoom"
-          className="w-full bg-backgroundLight text-primary text-center font-semibold border-2 border-primary py-4 rounded-lg  hover:bg-primary hover:text-white transition duration-300 transform active:scale-95"
-        >
-          Create Game
-        </Link>
+        <CreateGame />
       </div>
     </div>
   );
