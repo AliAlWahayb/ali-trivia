@@ -33,10 +33,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Queue not found' }, { status: 400 });
     }
 
-    // Check if the queue is empty
-    if (roomQueues[roomId].length === 0) {
-      return NextResponse.json({ error: 'Queue is empty' }, { status: 400 });
-    }
+    // // Check if the queue is empty
+    // if (roomQueues[roomId].length === 0) {
+    //   return NextResponse.json({ error: 'Queue is empty' }, { status: 400 });
+    // }
 
     
     // empty the queue

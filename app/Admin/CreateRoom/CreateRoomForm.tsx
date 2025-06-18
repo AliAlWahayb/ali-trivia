@@ -24,9 +24,7 @@ interface CreateRoomFormData {
   questionsCsv?: FileList;
 }
 
-export default function CreateRoomPage( ) {
-  
-
+export default function CreateRoomPage() {
   const router = useRouter(); // Initialize router
 
   const methods = useForm<CreateRoomFormData>({
@@ -54,6 +52,11 @@ export default function CreateRoomPage( ) {
   const [selectedCsvFile, setSelectedCsvFile] = useState<File | null>(null);
 
   const onSubmit = async (data: CreateRoomFormData) => {
+    // Clear questions from previous games
+    if (localStorage.getItem("trivia-questions")) {
+      localStorage.removeItem("trivia-questions");
+    }
+
     // Clean up data based on toggles
     if (!data.enableTimer) data.timer = undefined;
     if (!data.enableTeams) data.teams = undefined;
@@ -119,7 +122,6 @@ export default function CreateRoomPage( ) {
       {/* Use FormProvider to pass context to child components (like CsvUploadInput) */}
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-
           {/* Enable Sound Toggle */}
           <Controller
             name="enableSound"

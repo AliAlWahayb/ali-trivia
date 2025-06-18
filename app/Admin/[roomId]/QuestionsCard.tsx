@@ -2,11 +2,18 @@
 
 import { usePusherBind } from "@/hooks/usePusherBind";
 import { usePusherSubscribe } from "@/hooks/usePusherSubscribe";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Countdown, { zeroPad } from "react-countdown";
 
 interface Props {
   roomId: string;
+}
+
+interface TriviaQuestion {
+  id: string;
+  question: string;
+  answer: string;
+  [key: string]: string; // For any extra columns
 }
 
 export default function QuestionsCard({ roomId }: Props) {
@@ -33,12 +40,134 @@ export default function QuestionsCard({ roomId }: Props) {
 
   usePusherBind(channel, "leader-board", handleCount);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [questions, setQuestions] = useState({
-    id: 1,
-    question: "What is the capital of France?",
-    answer: "Paris",
-  });
+  const [questions, setQuestions] = useState<TriviaQuestion | null>(null);
+  const [remainingQuestions, setRemainingQuestions] = useState<
+    TriviaQuestion[]
+  >([]);
+
+  function parseCSV(csv: string): TriviaQuestion[] {
+    const [headerLine, ...lines] = csv.trim().split(/\r?\n/);
+    const headers = headerLine.split(",").map((h) => h.trim());
+    const questionIdx = headers.findIndex(
+      (h) => h.toLowerCase() === "question"
+    );
+    const answerIdx = headers.findIndex((h) => h.toLowerCase() === "answer");
+    const filteredLines = lines.filter((line) => line.trim().length > 0);
+    const parsed = filteredLines.map((line, idx) => {
+      const values = line.split(",");
+      return {
+        id: (idx + 1).toString(),
+        question: values[questionIdx >= 0 ? questionIdx : 0]?.trim() || "",
+        answer: values[answerIdx >= 0 ? answerIdx : 1]?.trim() || "",
+      };
+    });
+    return parsed;
+  }
+
+  useEffect(() => {
+    let shouldFetch = false;
+    let parsed: TriviaQuestion[] = [];
+    let current: TriviaQuestion | null = null;
+    const local = localStorage.getItem("trivia-questions");
+    if (local) {
+      try {
+        const parsedLocal = JSON.parse(local);
+        if (
+          typeof parsedLocal === "object" &&
+          parsedLocal !== null &&
+          Array.isArray(parsedLocal.remaining)
+        ) {
+          parsed = parsedLocal.remaining;
+          current = parsedLocal.current || null;
+          if (parsed.length === 0 && !current) {
+            localStorage.removeItem("trivia-questions");
+            shouldFetch = true;
+          }
+        } else {
+          localStorage.removeItem("trivia-questions");
+          shouldFetch = true;
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (e) {
+        localStorage.removeItem("trivia-questions");
+        shouldFetch = true;
+      }
+    } else {
+      shouldFetch = true;
+    }
+    if (shouldFetch) {
+      fetch("/cleaned_trivia.csv")
+        .then((res) => res.text())
+        .then((csv) => {
+          const parsedCSV = parseCSV(csv);
+          if (parsedCSV.length === 0) {
+            setError("No questions found in CSV.");
+            return;
+          }
+          // Pick a random question for the first one
+          const randomIdx = Math.floor(Math.random() * parsedCSV.length);
+          const firstQuestion = parsedCSV[randomIdx];
+          const next = [
+            ...parsedCSV.slice(0, randomIdx),
+            ...parsedCSV.slice(randomIdx + 1),
+          ];
+          setRemainingQuestions(next);
+          setQuestions(firstQuestion);
+          localStorage.setItem(
+            "trivia-questions",
+            JSON.stringify({ current: firstQuestion, remaining: next })
+          );
+        })
+        .catch(() => {
+          setError("Failed to load questions");
+        });
+    } else {
+      setRemainingQuestions(parsed);
+      setQuestions(current || parsed[0] || null);
+    }
+  }, []);
+
+  const popQuestion = () => {
+    if (remainingQuestions.length > 1) {
+      const randomIdx = Math.floor(Math.random() * remainingQuestions.length);
+      const nextQuestion = remainingQuestions[randomIdx];
+      const next = [
+        ...remainingQuestions.slice(0, randomIdx),
+        ...remainingQuestions.slice(randomIdx + 1),
+      ];
+      setRemainingQuestions(next);
+      setQuestions(nextQuestion);
+      localStorage.setItem(
+        "trivia-questions",
+        JSON.stringify({ current: nextQuestion, remaining: next })
+      );
+    } else if (remainingQuestions.length === 1) {
+      setRemainingQuestions([]);
+      setQuestions(null);
+      localStorage.removeItem("trivia-questions");
+    } else {
+      // try to reload from CSV if all else fails
+      fetch("/cleaned_trivia.csv")
+        .then((res) => res.text())
+        .then((csv) => {
+          const parsedCSV = parseCSV(csv);
+          if (parsedCSV.length > 0) {
+            const randomIdx = Math.floor(Math.random() * parsedCSV.length);
+            const nextQuestion = parsedCSV[randomIdx];
+            const next = [
+              ...parsedCSV.slice(0, randomIdx),
+              ...parsedCSV.slice(randomIdx + 1),
+            ];
+            setRemainingQuestions(next);
+            setQuestions(nextQuestion);
+            localStorage.setItem(
+              "trivia-questions",
+              JSON.stringify({ current: nextQuestion, remaining: next })
+            );
+          }
+        });
+    }
+  };
 
   // State for countdown
   const [targetDate, setTargetDate] = useState<number | null>(null);
@@ -110,6 +239,7 @@ export default function QuestionsCard({ roomId }: Props) {
         error instanceof Error ? error.message : "Failed to update score"
       );
     } finally {
+      popQuestion();
       setCorrectIsLoading(false);
     }
   };
@@ -183,6 +313,7 @@ export default function QuestionsCard({ roomId }: Props) {
         error instanceof Error ? error.message : "Failed to empty queue"
       );
     } finally {
+      popQuestion();
       stopCountdown();
       setSkiptIsLoading(false);
     }
@@ -218,10 +349,10 @@ export default function QuestionsCard({ roomId }: Props) {
       </div>
       <div className="flex flex-col justify-between text-center mb-4">
         <h1 className="text-xl font-bold mb-6 text-text-primary text-start">
-          {questions.question}
+          Question: {questions ? questions.question : "No more questions!"}
         </h1>
         <h1 className="text-xl font-bold mb-6 text-text-primary text-start">
-          Answer: {questions.answer}
+          Answer: {questions ? questions.answer : "-"}
         </h1>
       </div>
       <div className="flex flex-col gap-4 justify-between mt-6">
@@ -260,21 +391,21 @@ export default function QuestionsCard({ roomId }: Props) {
             </div>
           )}
           <button
-            disabled={correctIsLoading}
+            disabled={correctIsLoading || !questions}
             onClick={handelCorrectAnswer}
             className="w-full bg-success text-white font-semibold py-2 rounded-lg  hover:bg-primary hover:text-white transition duration-300 transform active:scale-95"
           >
             Correct Answer
           </button>
           <button
-            disabled={wrongIsLoading}
+            disabled={wrongIsLoading || !questions}
             onClick={handleWrongAnswer}
             className="w-full bg-danger text-white font-semibold py-2 rounded-lg  hover:bg-primary hover:text-white transition duration-300 transform active:scale-95"
           >
             Wrong Answer
           </button>
           <button
-            disabled={skiptIsLoading}
+            disabled={skiptIsLoading || !questions}
             onClick={handleSkip}
             className="w-full bg-warning text-white font-semibold py-2 rounded-lg  hover:bg-primary hover:text-white transition duration-300 transform active:scale-95"
           >
