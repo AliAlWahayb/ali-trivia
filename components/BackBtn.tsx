@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
+import { customConfirm } from "./customConfirm";
 
 interface BackBtnProps {
   role?: string;
@@ -50,9 +51,9 @@ const BackBtn = ({ role, name, roomId, noConfirm=false }: BackBtnProps) => {
   const router = useRouter();
 
   // Handles the back button click with confirmation and cleanup
-  const handleBack = () => {
+  const handleBack = async () => {
     // If noConfirm prop is passed, skip confirmation
-    if (!noConfirm && !window.confirm("Are you sure you want to go back?")) return;
+    if (!noConfirm && !(await customConfirm("Are you sure you want to go back?", "Yes", "No"))) return;
 
     // Clean up based on role
     if (role === "admin") {

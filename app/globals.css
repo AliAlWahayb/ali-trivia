@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tailwindcss-animated";
 
 
 @theme {
@@ -14,7 +15,7 @@
   --color-primary: #2563eb; /* Blue */
   --color-secondary: #3b82f6; /* Dark Blue */
   --color-accent: #fbbf24; /* Yellow */
-  --color-muted: #6b7280; /* Gray */
+  --color-muted: #d1d5dc; /* Gray */
   --color-text-primary: #111827; /* Very Dark Gray (for main text) */
   --color-text-secondary: #374151; /* Darker Gray (for secondary text) */
   --color-text-muted: #6b7280; /* Muted Gray (for less emphasized text) */

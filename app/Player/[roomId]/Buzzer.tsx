@@ -117,9 +117,9 @@ export default function Buzzer({ roomId, username }: Player) {
       }
 
       console.log("Buzzed in successfully");
-      setBuzzedIn(true); //makes the waiting state buggy, so we handle it in the queue update
-      setYourTurn(data.queue[0] === username);
-      console.log(data);
+      // setBuzzedIn(true); //makes the waiting state buggy, so we handle it in the queue update
+      // setYourTurn(data.queue[0] === username);
+      // console.log(data);
     } catch (error) {
       console.error("Error buzzing in:", error);
       setError(error instanceof Error ? error.message : "Failed to buzz in");

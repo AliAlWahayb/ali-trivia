@@ -1,4 +1,5 @@
 "use client";
+import { customConfirm } from "@/components/customConfirm";
 import { usePusherBind } from "@/hooks/usePusherBind";
 import { usePusherSubscribe } from "@/hooks/usePusherSubscribe";
 import * as Accordion from "@radix-ui/react-accordion";
@@ -107,6 +108,8 @@ const AdminAccordion = ({ roomId }: Props) => {
   );
 
   const handelKick = async (player: string) => {
+    if (!(await customConfirm("Are you sure you want to kick this player?", "Yes", "No"))) return;
+
     if (kickIsLoading) return;
 
     try {
@@ -142,6 +145,7 @@ const AdminAccordion = ({ roomId }: Props) => {
   };
 
   const handelEnd = async () => {
+    if (!(await customConfirm("Are you sure you want to end the game?", "Yes", "No"))) return;
     if (endIsLoading) return;
 
     try {
@@ -247,7 +251,7 @@ const AdminAccordion = ({ roomId }: Props) => {
                   </button>
                 </div>
               )}
-              
+
               <div>
                 {/* Header row for labels */}
                 <div className="grid grid-cols-3 gap-4 mb-2 pb-1">
