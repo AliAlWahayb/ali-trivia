@@ -24,7 +24,7 @@ export default function RealFooter({ lang, dict }: RealFooterProps) {
   }
 
   return (
-    <footer className="w-full bg-white">
+    <footer className="w-full bg-background-light">
       <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 px-6 py-4">
         <div className="flex items-center gap-2">
           <div className="relative flex bg-gray-200 rounded-full shadow-inner w-32 h-8 overflow-hidden">

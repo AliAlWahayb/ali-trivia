@@ -26,7 +26,6 @@ kick update leaderboard :done
 
 sometimes the player counter dosent work :done
 add arabic support and make it default:done
-fix not found page
 fix the lang when redirecrting to any page :done
-player score bug first time
-admin bug first player join
+fix not found page :done
+fix  ⨯ TypeError: Cannot destructure property 'lang' of '(intermediate value)' as it is undefined.

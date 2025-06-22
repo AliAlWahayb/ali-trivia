@@ -7,7 +7,7 @@ export default async function JoinLeaderBoard({
 }: {
   params: { lang: "ar" | "en" };
 }) {
-  const { lang } = params;
+  const { lang } = await params;
   const dict = await getDictionary(lang);
   return (
     <div className="flex flex-col items-center  p-5 min-h-screen bg-background-light">
