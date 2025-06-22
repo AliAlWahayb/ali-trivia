@@ -1,9 +1,10 @@
 "use client";
+import { Dict } from "@/types/dict";
 import { usePathname, useRouter } from "next/navigation";
 
 interface RealFooterProps {
   lang: "ar" | "en";
-  dict: Record<string, string>;
+  dict: Dict;
 }
 
 export default function RealFooter({ lang, dict }: RealFooterProps) {
@@ -63,13 +64,12 @@ export default function RealFooter({ lang, dict }: RealFooterProps) {
               href="https://www.linkedin.com/in/alialwahayb/"
               className="text-primary underline hover:text-primary-dark"
               target="_blank"
-              rel="noopener noreferrer"
             >
               {dict.alialwahayb}
             </a>
           </span>
           <span className="text-gray-400 text-xs mt-1">
-            {dict.version} 1.0.0
+             1.0.0
           </span>
         </div>
       </div>

@@ -12,7 +12,7 @@ import Countdown, { zeroPad } from "react-countdown";
 interface Props {
   roomId: string;
   lang: "ar" | "en";
-  dict: Record<string, string>;
+  dict: Dict;
 }
 
 interface TriviaQuestion {

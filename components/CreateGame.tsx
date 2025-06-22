@@ -1,10 +1,11 @@
 "use client";
 
+import { Dict } from "@/types/dict";
 import { useRouter } from "next/navigation";
 
 interface CreateGameProps {
   lang: "ar" | "en";
-  dict: Record<string, string>;
+  dict: Dict;
 }
 
 const CreateGame = ({ dict, lang }: CreateGameProps) => {
@@ -33,7 +34,7 @@ const CreateGame = ({ dict, lang }: CreateGameProps) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Failed to create room:", error);
-      alert(`${dict.dangerAlert}\n${error.message}`); // Basic alert for user feedback
+      alert(`${dict.errors.dangerAlert}\n${error.message}`); // Basic alert for user feedback
     }
   };
 

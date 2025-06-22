@@ -36,7 +36,6 @@ export interface ErrorsDict {
 
 export interface Dict {
     buzzerQueue: string;
-    gameHasEnded: string;
     theWinnerIs: string;
     appName: string;
     language: string;

@@ -1,6 +1,7 @@
 // components/ErrorBoundary.tsx
 "use client";
 
+import { Dict } from "@/types/dict";
 import React from "react";
 
 interface ErrorBoundaryState {
@@ -10,7 +11,7 @@ interface ErrorBoundaryState {
 
 interface ErrorBoundaryProps {
   lang: "ar" | "en";
-  dict: Record<string, string>;
+  dict: Dict;
 }
 
 class ErrorBoundary extends React.Component<

@@ -1,3 +1,4 @@
+import { Dict } from "@/types/dict";
 import React, { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 
@@ -8,7 +9,7 @@ export function customConfirm(
   message: string,
   confirmText = "OK",
   cancelText = "Cancel",
-  dict?: Record<string, string>
+  dict?: Dict
 ): Promise<boolean> {
   return new Promise((resolve) => {
     const div = document.createElement("div");
@@ -57,7 +58,7 @@ export function customConfirm(
                 }}
                 className="px-4 py-2 rounded bg-primary text-white hover:bg-primary-dark"
               >
-                {dict ? dict.confirm : confirmText}
+                {dict ? dict.yes : confirmText}
               </button>
             </div>
           </div>

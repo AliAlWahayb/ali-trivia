@@ -10,8 +10,8 @@ interface BackBtnProps {
   name?: string;
   roomId?: string;
   noConfirm?: boolean; // Optional prop to skip confirmation
-  dict: Dict; // Optional dictionary for translations
-  lang: "ar" | "en"; // Optional language prop
+  dict: Dict;
+  lang: "ar" | "en";
 }
 
 // Handles ending the game for admin

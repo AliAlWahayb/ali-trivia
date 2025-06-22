@@ -196,7 +196,7 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
       <div className="flex flex-col  w-full h-full bg-secondary rounded-lg  p-4 items-center ">
         <div className="bg-secondary text-white p-4 rounded-lg text-center max-w-md">
           <h3 className="font-bold mb-2 capitalize">
-            {dict.gameHasEnded || "Game has ended"}
+            {dict.errors.gameEndedRedirect || "Game has ended"}
           </h3>
           <p className="mb-4 capitalize">
             {dict.theWinnerIs}: {topScorePlayer.player}

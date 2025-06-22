@@ -41,13 +41,23 @@ export default async function Room({
               lang={lang}
             />
             <div className="flex-1 flex items-center justify-center text-center">
-              <DynamicText text={payload?.player || dict.UnknownPlayer} />
+              <DynamicText text={payload?.player || dict.errors.UnknownPlayer} />
             </div>
             <div style={{ width: 40 }} />
           </div>
-          <Score roomId={roomId} username={payload?.player} lang={lang} dict={dict} />
+          <Score
+            roomId={roomId}
+            username={payload?.player}
+            lang={lang}
+            dict={dict}
+          />
         </div>
-        <Buzzer roomId={roomId} username={payload?.player} lang={lang} dict={dict} />
+        <Buzzer
+          roomId={roomId}
+          username={payload?.player}
+          lang={lang}
+          dict={dict}
+        />
       </div>
     </ErrorBoundary>
   );
