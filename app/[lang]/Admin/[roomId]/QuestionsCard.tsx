@@ -206,15 +206,18 @@ export default function QuestionsCard({ roomId, dict }: QuestionsCardProps) {
   };
 
   const [topQueue, setTopQueue] = useState<string>("");
+  const [disableBtn, setDisableBtn] = useState(true);
   const handleQueue = useCallback(
     (data: string[]) => {
       try {
         console.log("Queue update received:", data); // Debug log
         if (!data || data.length === 0) {
           setTopQueue("");
+          setDisableBtn(true);
           stopCountdown();
         } else {
           setTopQueue(data[0]);
+          setDisableBtn(false);
           startCountdown();
         }
       } catch (err) {
@@ -419,14 +422,14 @@ export default function QuestionsCard({ roomId, dict }: QuestionsCardProps) {
             />
           )}
           <button
-            disabled={correctIsLoading || !questions}
+            disabled={correctIsLoading || !questions || disableBtn}
             onClick={handelCorrectAnswer}
             className="w-full bg-success text-white font-semibold py-2 rounded-lg  hover:bg-primary hover:text-white transition duration-300 transform active:scale-95"
           >
             {dict.correctAnswer}
           </button>
           <button
-            disabled={wrongIsLoading || !questions}
+            disabled={wrongIsLoading || !questions || disableBtn}
             onClick={handleWrongAnswer}
             className="w-full bg-danger text-white font-semibold py-2 rounded-lg  hover:bg-primary hover:text-white transition duration-300 transform active:scale-95"
           >

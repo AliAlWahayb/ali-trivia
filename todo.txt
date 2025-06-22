@@ -28,4 +28,8 @@ sometimes the player counter dosent work :done
 add arabic support and make it default:done
 fix the lang when redirecrting to any page :done
 fix not found page :done
-fix  ⨯ TypeError: Cannot destructure property 'lang' of '(intermediate value)' as it is undefined.
+fix  ⨯ TypeError: Cannot destructure property 'lang' of '(intermediate value)' as it is undefined. :done
+
+fix dict={dict} 
+fix after player kick bug
+ask ai 

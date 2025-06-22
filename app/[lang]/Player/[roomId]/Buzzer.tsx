@@ -8,11 +8,6 @@ import { usePusherSubscribe } from "@/hooks/usePusherSubscribe";
 import { Dict } from "@/types/dict";
 import { useState, useCallback, useEffect } from "react";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface Player {
-  roomId: string;
-  username: string;
-}
 
 interface BuzzerProps {
   roomId: string;

@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { getDictionary } from "../dictionaries";
+import { Dict } from "@/types/dict";
 
 interface NotFoundProps {
   lang: "ar" | "en";
-    dict: Record<string, string>;
+  dict: Dict;
 }
 
 export default async function NotFoundPage({
