@@ -10,8 +10,8 @@ export default async function LeaderBoardRoomPage({
 }: {
   params: { lang: "ar" | "en"; roomId: string };
 }) {
-  const { lang, roomId } = params;
-  const dict = await getDictionary(lang);
+  const { lang, roomId } = await params;
+  const dict = { gameHasEnded: "", ...(await getDictionary(lang)) };
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
 

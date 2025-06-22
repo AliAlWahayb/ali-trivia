@@ -27,11 +27,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Leaderboard not found' }, { status: 400 });
     }
 
-    // Check if the leaderboard for the room is empty
-    // Uncomment the following lines if you want to enforce that the leaderboard must have entries
-    // if (leaderboard[roomId].length === 0) {
-    //   return NextResponse.json({ error: 'Leaderboard is empty' }, { status: 400 });
-    // }
+    if (leaderboard[roomId].length === 0) {
+      return NextResponse.json({ error: 'Leaderboard is empty' }, { status: 400 });
+    }
 
     const topScorePlayer = leaderboard[roomId].length > 0
       ? leaderboard[roomId].reduce((max, current) => {

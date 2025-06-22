@@ -3,13 +3,14 @@
 import { useRouter } from "next/navigation";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import { customConfirm } from "./customConfirm";
+import { Dict } from "@/types/dict";
 
 interface BackBtnProps {
   role?: string;
   name?: string;
   roomId?: string;
   noConfirm?: boolean; // Optional prop to skip confirmation
-  dict: Record<string, string>; // Optional dictionary for translations
+  dict: Dict; // Optional dictionary for translations
   lang: "ar" | "en"; // Optional language prop
 }
 
