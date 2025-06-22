@@ -9,6 +9,8 @@ interface BackBtnProps {
   name?: string;
   roomId?: string;
   noConfirm?: boolean; // Optional prop to skip confirmation
+  dict: Record<string, string>; // Optional dictionary for translations
+  lang: "ar" | "en"; // Optional language prop
 }
 
 // Handles ending the game for admin
@@ -47,13 +49,14 @@ const handleLeave = async (player: string, roomId: string) => {
   }
 };
 
-const BackBtn = ({ role, name, roomId, noConfirm=false }: BackBtnProps) => {
+const BackBtn = ({ role, name, roomId, noConfirm=false, dict, lang }: BackBtnProps) => {
+
   const router = useRouter();
 
   // Handles the back button click with confirmation and cleanup
   const handleBack = async () => {
     // If noConfirm prop is passed, skip confirmation
-    if (!noConfirm && !(await customConfirm("Are you sure you want to go back?", "Yes", "No"))) return;
+    if (!noConfirm && !(await customConfirm(dict.backConfirmation, dict.yes, dict.no))) return;
 
     // Clean up based on role
     if (role === "admin") {
@@ -64,7 +67,7 @@ const BackBtn = ({ role, name, roomId, noConfirm=false }: BackBtnProps) => {
     } else if (role === "player") {
       if (name && roomId) handleLeave(name, roomId);
     }
-    router.push("/");
+    router.push(`/${lang}`);
   };
 
   return (

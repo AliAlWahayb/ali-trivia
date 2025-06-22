@@ -2,9 +2,13 @@
 
 import { useRouter } from "next/navigation";
 
+interface CreateGameProps {
+  lang: "ar" | "en";
+  dict: Record<string, string>;
+}
 
-const CreateGame = () => {
-    const router = useRouter();
+const CreateGame = ({ dict, lang }: CreateGameProps) => {
+  const router = useRouter();
   const onSubmit = async () => {
     // Clear questions from previous games
     if (localStorage.getItem("trivia-questions")) {
@@ -25,21 +29,20 @@ const CreateGame = () => {
       console.log("Room created successfully:", result);
 
       // Redirect to the admin game master dashboard using the actual roomId from the server response
-      router.push(`/Admin/${result.roomId}`);
+      router.push(`/${lang}/Admin/${result.roomId}`);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Failed to create room:", error);
-      alert(`Failed to create room: ${error.message}`); // Basic alert for user feedback
+      alert(`${dict.dangerAlert}\n${error.message}`); // Basic alert for user feedback
     }
   };
 
   return (
     <button
       onClick={onSubmit}
-      
       className="w-full bg-backgroundLight text-primary text-center font-semibold border-2 border-primary py-4 rounded-lg  hover:bg-primary hover:text-white transition duration-300 transform active:scale-95"
     >
-      Create Game
+      {dict.createGame}
     </button>
   );
 };

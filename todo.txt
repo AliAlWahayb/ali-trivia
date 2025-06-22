@@ -24,5 +24,9 @@ fix long text size :done
 kick update leaderboard :done
 
 
-sometimes the player counter dosent work
-add arabic support and make it default
+sometimes the player counter dosent work :done
+add arabic support and make it default:done
+fix not found page
+fix the lang when redirecrting to any page :done
+player score bug first time
+admin bug first player join
