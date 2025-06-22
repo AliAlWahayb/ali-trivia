@@ -4,6 +4,8 @@ import { useForm, FormProvider } from "react-hook-form";
 import TextInput from "@/components/TextInput";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import ErrorAlert from "@/components/ErrorAlert";
+import { Dict } from "@/types/dict";
 
 interface JoinLeaderBoardFormData {
   roomCode: string;
@@ -11,7 +13,7 @@ interface JoinLeaderBoardFormData {
 
 interface JoinLeaderBoardFormProps {
   lang: "ar" | "en";
-  dict: Record<string, string>;
+  dict: Dict;
 }
 
 export default function JoinLeaderBoardForm({
@@ -38,7 +40,7 @@ export default function JoinLeaderBoardForm({
     });
     const result = await res.json();
     if (result.error) {
-      setError(dict.connectionError);
+      setError(dict.errors.connectionError);
       return;
     }
     router.push(`/${lang}/LeaderBoard/${data.roomCode}`);
@@ -76,15 +78,11 @@ export default function JoinLeaderBoardForm({
           />
 
           {error && (
-            <div className="bg-red-500 text-white p-2 text-center">
-              {error}
-              <button
-                onClick={() => setError(null)}
-                className="ml-2 text-xs underline"
-              >
-                Dismiss
-              </button>
-            </div>
+            <ErrorAlert
+              message={error}
+              onDismiss={() => setError(null)}
+              dict={dict}
+            />
           )}
           {/* Submit Button */}
           <button

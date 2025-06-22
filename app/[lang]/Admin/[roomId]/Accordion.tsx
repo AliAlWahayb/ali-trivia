@@ -1,7 +1,10 @@
 "use client";
 import { customConfirm } from "@/components/customConfirm";
+import ErrorAlert from "@/components/ErrorAlert";
+import PusherError from "@/components/PusherError";
 import { usePusherBind } from "@/hooks/usePusherBind";
 import { usePusherSubscribe } from "@/hooks/usePusherSubscribe";
+import { Dict } from "@/types/dict";
 import * as Accordion from "@radix-ui/react-accordion";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 import { AutoTextSize } from "auto-text-size";
@@ -11,14 +14,13 @@ import { useCallback, useEffect, useState } from "react";
 interface Props {
   roomId: string;
   lang: "ar" | "en";
-  dict: Record<string, string>;
+  dict: Dict;
 }
 
 interface Player {
   player: string;
   score: number;
 }
-
 
 const AdminAccordion = ({ roomId, dict, lang }: Props) => {
   const [AccordionOpen, setAccordionOpen] = useState(false);
@@ -57,13 +59,11 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
         console.log(data);
       } catch (error) {
         console.error("Error getting leaderboard:", error);
-        setError(
-          error instanceof Error ? error.message : "Failed to get leaderboard"
-        );
+        setError(dict.errors.FailedToGetLeaderboard);
       }
     };
     fetchLeaderboard();
-  }, [roomId]);
+  }, [dict.errors.FailedToGetLeaderboard, roomId]);
 
   const channelName = `room-${roomId}`;
   const { channel, error: pusherError } = usePusherSubscribe(channelName);
@@ -85,23 +85,26 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
         }, 60000);
       } catch (err) {
         console.error("Error ending game:", err);
-        setError("Failed to end game");
+        setError(dict.errors.failedToEndGame);
       }
     },
-    [lang, router]
+    [dict.errors.failedToEndGame, lang, router]
   );
 
   usePusherBind(channel, "end-game", handelGameEnd);
 
-  const handleList = useCallback((data: Player[]) => {
-    try {
-      console.log("leaderboard received:", data); // Debug log
-      setPlayers(data);
-    } catch (err) {
-      console.error("Error handling players:", err);
-      setError("Failed to get player status");
-    }
-  }, []);
+  const handleList = useCallback(
+    (data: Player[]) => {
+      try {
+        console.log("leaderboard received:", data); // Debug log
+        setPlayers(data);
+      } catch (err) {
+        console.error("Error handling players:", err);
+        setError(dict.errors.failedToGetStatus);
+      }
+    },
+    [dict.errors.failedToGetStatus]
+  );
 
   usePusherBind(channel, "leader-board", handleList);
 
@@ -140,9 +143,7 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
       console.log("kicked player successfully");
     } catch (error) {
       console.error("Error kicking player:", error);
-      setError(
-        error instanceof Error ? error.message : "Failed to kick player"
-      );
+      setError(dict.errors.FailedToKickPlayer);
     } finally {
       setKickIsLoading(false);
     }
@@ -178,7 +179,7 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
       console.log("ended game successfully");
     } catch (error) {
       console.error("Error ending game:", error);
-      setError(error instanceof Error ? error.message : "Failed to end game");
+      setError(dict.errors.failedToEndGame);
     } finally {
       setEndIsLoading(false);
     }
@@ -186,20 +187,7 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
 
   // Show error state
   if (pusherError) {
-    return (
-      <div className="flex flex-col min-h-screen w-full h-full bg-red-100 p-4 items-center justify-center">
-        <div className="bg-red-500 text-white p-4 rounded-lg text-center max-w-md">
-          <h3 className="font-bold mb-2">{dict.connectionError}</h3>
-          <p className="mb-4">{pusherError.message}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="bg-white text-red-500 px-4 py-2 rounded hover:bg-gray-100"
-          >
-            {dict.refreshPage}
-          </button>
-        </div>
-      </div>
-    );
+    return <PusherError dict={dict} pusherError={pusherError.message} />;
   }
 
   // end game
@@ -249,15 +237,11 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
           <Accordion.Content className="py-4">
             <div>
               {error && (
-                <div className="bg-red-500 text-white p-2 text-center">
-                  {error}
-                  <button
-                    onClick={() => setError(null)}
-                    className="ml-2 text-xs underline"
-                  >
-                    Dismiss
-                  </button>
-                </div>
+                <ErrorAlert
+                  message={error}
+                  onDismiss={() => setError(null)}
+                  dict={dict}
+                />
               )}
 
               <div>
@@ -308,6 +292,7 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
 
               <div className=" text-center mt-4">
                 <button
+                disabled={players.length === 0 || endIsLoading}
                   onClick={() => handelEnd()}
                   className=" bg-danger text-white font-semibold px-2 py-0.5 rounded-lg  hover:bg-primary hover:text-white transition duration-300 transform active:scale-95"
                 >

@@ -3,6 +3,8 @@ import { usePusherBind } from "@/hooks/usePusherBind";
 import { usePusherSubscribe } from "@/hooks/usePusherSubscribe";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import PusherError from "@/components/PusherError";
+import { Dict } from "@/types/dict";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface Player {
@@ -14,7 +16,7 @@ interface ScoreProps {
   roomId: string;
   username: string;
   lang: "ar" | "en";
-  dict: Record<string, string>;
+  dict: Dict;
 }
 
 const Score = ({ roomId, username, dict, lang }: ScoreProps) => {
@@ -35,7 +37,7 @@ const Score = ({ roomId, username, dict, lang }: ScoreProps) => {
         if (playerData) {
           setScore(playerData.score); // Update score based on player data
         } else {
-          setError(dict.playerRemoved);
+          setError(dict.errors.playerRemoved);
           // Wait for 7 seconds before redirecting
           setTimeout(() => {
             router.push(`/${lang}/`);
@@ -43,10 +45,10 @@ const Score = ({ roomId, username, dict, lang }: ScoreProps) => {
         }
       } catch (err) {
         console.error("Error handling players:", err);
-        setError(dict.failedToGetStatus);
+        setError(dict.errors.failedToGetStatus);
       }
     },
-    [username, dict.playerRemoved, dict.failedToGetStatus, router, lang]
+    [username, dict.errors.playerRemoved, dict.errors.failedToGetStatus, router, lang]
   );
 
   usePusherBind(channel, "leader-board", handleList);
@@ -62,7 +64,7 @@ const Score = ({ roomId, username, dict, lang }: ScoreProps) => {
         localStorage.removeItem("roomId");
         sessionStorage.clear();
 
-        setError(dict.gameEndedRedirect);
+        setError(dict.errors.gameEndedRedirect);
 
         // Wait for 7 seconds before redirecting
         setTimeout(() => {
@@ -70,10 +72,10 @@ const Score = ({ roomId, username, dict, lang }: ScoreProps) => {
         }, 7000);
       } catch (err) {
         console.error("Error ending game:", err);
-        setError(dict.failedToEndGame);
+        setError(dict.errors.failedToEndGame);
       }
     },
-    [dict.gameEndedRedirect, dict.failedToEndGame, router, lang]
+    [dict.errors.gameEndedRedirect, dict.errors.failedToEndGame, router, lang]
   );
 
   usePusherBind(channel, "end-game", handelGameEnd);
@@ -98,7 +100,7 @@ const Score = ({ roomId, username, dict, lang }: ScoreProps) => {
           if (playerData) {
             setScore(playerData.score);
           } else {
-            setError(dict.playerRemoved);
+            setError(dict.errors.playerRemoved);
             setTimeout(() => {
               router.push(`/${lang}/`);
             }, 7000);
@@ -109,7 +111,7 @@ const Score = ({ roomId, username, dict, lang }: ScoreProps) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         setScore(0);
-        setError(dict.failedToGetStatus);
+        setError(dict.errors.failedToGetStatus);
       }
     };
     fetchPlayerScore();
@@ -117,20 +119,7 @@ const Score = ({ roomId, username, dict, lang }: ScoreProps) => {
 
   // Show error state
   if (pusherError) {
-    return (
-      <div className="flex flex-col min-h-screen w-full h-full bg-red-100 p-4 items-center justify-center">
-        <div className="bg-red-500 text-white p-4 rounded-lg text-center max-w-md">
-          <h3 className="font-bold mb-2">{dict["connection_error"]}</h3>
-          <p className="mb-4">{pusherError.message}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="bg-white text-red-500 px-4 py-2 rounded hover:bg-gray-100"
-          >
-            {dict.refreshPage}
-          </button>
-        </div>
-      </div>
-    );
+    return <PusherError dict={dict} pusherError={pusherError.message} />;
   }
 
   return (

@@ -1,12 +1,15 @@
 "use client";
+import ErrorAlert from "@/components/ErrorAlert";
+import PusherError from "@/components/PusherError";
 import { usePusherBind } from "@/hooks/usePusherBind";
 import { usePusherSubscribe } from "@/hooks/usePusherSubscribe";
+import { Dict } from "@/types/dict";
 import { useCallback, useEffect, useState } from "react";
 
 interface Props {
   roomId: string;
   lang: "ar" | "en";
-  dict: Record<string, string>;
+  dict: Dict;
 }
 
 const Queue = ({ roomId, dict }: Props) => {
@@ -44,46 +47,34 @@ const Queue = ({ roomId, dict }: Props) => {
         console.log(data.queue);
       } catch (error) {
         console.error("Error getting queue:", error);
-        setError(
-          error instanceof Error ? error.message : "Failed to get queue"
-        );
+        setError(dict.errors.FailedToGetQueue);
       }
     };
     fetchQueue();
-  }, [roomId]);
+  }, [dict.errors.FailedToGetQueue, roomId]);
 
-  const handleQueue = useCallback((data: string[]) => {
-    try {
-      console.log("Queue update received:", data); // Debug log
-      if (!data || data.length === 0) {
-        setQueue([]);
-      } else {
-        setQueue(data);
+  const handleQueue = useCallback(
+    (data: string[]) => {
+      try {
+        console.log("Queue update received:", data); // Debug log
+        if (!data || data.length === 0) {
+          setQueue([]);
+        } else {
+          setQueue(data);
+        }
+      } catch (err) {
+        console.error("Error handling queue update:", err);
+        setError(dict.errors.FailedToUpdateQueueStatus);
       }
-    } catch (err) {
-      console.error("Error handling queue update:", err);
-      setError("Failed to update queue status");
-    }
-  }, []);
+    },
+    [dict.errors.FailedToUpdateQueueStatus]
+  );
 
   usePusherBind(channel, "buzzer-queue", handleQueue);
 
   // Show error state
   if (pusherError) {
-    return (
-      <div className="flex flex-col min-h-screen w-full h-full bg-red-100 p-4 items-center justify-center">
-        <div className="bg-red-500 text-white p-4 rounded-lg text-center max-w-md">
-          <h3 className="font-bold mb-2">{dict.connectionErrorTitle}</h3>
-          <p className="mb-4">{pusherError.message}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="bg-white text-red-500 px-4 py-2 rounded hover:bg-gray-100"
-          >
-            {dict.refreshPage}
-          </button>
-        </div>
-      </div>
-    );
+    return <PusherError dict={dict} pusherError={pusherError.message} />;
   }
 
   return (
@@ -96,15 +87,11 @@ const Queue = ({ roomId, dict }: Props) => {
 
       <div className="mt-4">
         {error && (
-          <div className="bg-red-500 text-white p-2 text-center">
-            {error}
-            <button
-              onClick={() => setError(null)}
-              className="ml-2 text-xs underline"
-            >
-              {dict.dismiss}
-            </button>
-          </div>
+          <ErrorAlert
+            message={error}
+            onDismiss={() => setError(null)}
+            dict={dict}
+          />
         )}
         {queue.length > 0 ? (
           queue.map((name, idx) => (
@@ -117,7 +104,7 @@ const Queue = ({ roomId, dict }: Props) => {
           ))
         ) : (
           <p className="text-text-primary text-center">
-            {dict.noPlayersInQueue}
+            {dict.errors.noPlayersInQueue}
           </p>
         )}
       </div>

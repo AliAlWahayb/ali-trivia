@@ -4,6 +4,8 @@ import { useForm, FormProvider } from "react-hook-form";
 import TextInput from "@/components/TextInput";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import ErrorAlert from "@/components/ErrorAlert";
+import { Dict } from "@/types/dict";
 
 interface JoinRoomFormData {
   roomCode: string;
@@ -12,7 +14,7 @@ interface JoinRoomFormData {
 
 interface JoinRoomFormProps {
   lang: "ar" | "en";
-  dict: Record<string, string>;
+  dict: Dict;
 }
 
 export default function JoinRoomForm({ dict, lang }: JoinRoomFormProps) {
@@ -42,7 +44,7 @@ export default function JoinRoomForm({ dict, lang }: JoinRoomFormProps) {
 
       if (roomResult.error) {
         console.error("Error joining room:", roomResult.error);
-        setError(roomResult.error);
+        setError(dict.errors.connectionError);
         return;
       }
 
@@ -75,9 +77,9 @@ export default function JoinRoomForm({ dict, lang }: JoinRoomFormProps) {
               required: true,
               pattern: {
                 value: /^\d{4}$/,
-                message: dict.roomCodeError,
+                message: dict.errors.roomCodeError,
               },
-              validate: (value) => value.length === 4 || dict.roomCodeError,
+              validate: (value) => value.length === 4 || dict.errors.roomCodeError,
             })}
             onInput={(e) => {
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -100,15 +102,11 @@ export default function JoinRoomForm({ dict, lang }: JoinRoomFormProps) {
           />
 
           {error && (
-            <div className="bg-red-500 text-white p-2 text-center">
-              {error}
-              <button
-                onClick={() => setError(null)}
-                className="ml-2 text-xs underline"
-              >
-                Dismiss
-              </button>
-            </div>
+            <ErrorAlert
+              message={error}
+              onDismiss={() => setError(null)}
+              dict={dict}
+            />
           )}
 
           {/* Submit Button */}

@@ -1,7 +1,10 @@
 "use client";
 
+import ErrorAlert from "@/components/ErrorAlert";
+import PusherError from "@/components/PusherError";
 import { usePusherBind } from "@/hooks/usePusherBind";
 import { usePusherSubscribe } from "@/hooks/usePusherSubscribe";
+import { Dict } from "@/types/dict";
 import { useCallback, useEffect, useState } from "react";
 import Countdown, { zeroPad } from "react-countdown";
 
@@ -22,13 +25,10 @@ interface TriviaQuestion {
 interface QuestionsCardProps {
   roomId: string;
   lang: "ar" | "en";
-  dict: Record<string, string>;
+  dict: Dict;
 }
 
-export default function QuestionsCard({
-  roomId,
-  dict,
-}: QuestionsCardProps) {
+export default function QuestionsCard({ roomId, dict }: QuestionsCardProps) {
   const [Round, setRound] = useState(1);
   const [Players, setPlayers] = useState(0);
 
@@ -51,10 +51,10 @@ export default function QuestionsCard({
         }
       } catch (err) {
         console.error("Error handling player count:", err);
-        setError("Failed to update player status");
+        setError(dict.errors.FailedToUpdatePlayerStatus);
       }
     },
-    [setPlayers, setError]
+    [dict.errors.FailedToUpdatePlayerStatus]
   );
 
   usePusherBind(channel, "leader-board", handleCount);
@@ -120,7 +120,7 @@ export default function QuestionsCard({
         .then((csv) => {
           const parsedCSV = parseCSV(csv);
           if (parsedCSV.length === 0) {
-            setError("No questions found in CSV.");
+            setError(dict.errors.noMoreQuestions);
             return;
           }
           // Pick a random question for the first one
@@ -138,13 +138,13 @@ export default function QuestionsCard({
           );
         })
         .catch(() => {
-          setError("Failed to load questions");
+          setError(dict.errors.FailedToLoadQuestions);
         });
     } else {
       setRemainingQuestions(parsed);
       setQuestions(current || parsed[0] || null);
     }
-  }, []);
+  }, [dict.errors.FailedToLoadQuestions, dict.errors.noMoreQuestions]);
 
   const popQuestion = () => {
     if (remainingQuestions.length > 1) {
@@ -206,21 +206,24 @@ export default function QuestionsCard({
   };
 
   const [topQueue, setTopQueue] = useState<string>("");
-  const handleQueue = useCallback((data: string[]) => {
-    try {
-      console.log("Queue update received:", data); // Debug log
-      if (!data || data.length === 0) {
-        setTopQueue("");
-        stopCountdown();
-      } else {
-        setTopQueue(data[0]);
-        startCountdown();
+  const handleQueue = useCallback(
+    (data: string[]) => {
+      try {
+        console.log("Queue update received:", data); // Debug log
+        if (!data || data.length === 0) {
+          setTopQueue("");
+          stopCountdown();
+        } else {
+          setTopQueue(data[0]);
+          startCountdown();
+        }
+      } catch (err) {
+        console.error("Error handling queue top:", err);
+        setError(dict.errors.FailedToUpdateQueueStatus);
       }
-    } catch (err) {
-      console.error("Error handling queue top:", err);
-      setError("Failed to update queue status");
-    }
-  }, []);
+    },
+    [dict.errors.FailedToUpdateQueueStatus]
+  );
 
   usePusherBind(channel, "buzzer-queue", handleQueue);
 
@@ -250,15 +253,13 @@ export default function QuestionsCard({
 
       setRound(Round + 1);
       setShouldRestart(false);
+      popQuestion();
 
       console.log("updated score successfully");
     } catch (error) {
       console.error("Error updating score:", error);
-      setError(
-        error instanceof Error ? error.message : "Failed to update score"
-      );
+      setError(dict.errors.FailedToUpdateScore);
     } finally {
-      popQuestion();
       setCorrectIsLoading(false);
     }
   };
@@ -291,7 +292,7 @@ export default function QuestionsCard({
       console.log("popped queue successfully");
     } catch (error) {
       console.error("Error popping queue:", error);
-      setError(error instanceof Error ? error.message : "Failed to pop queue");
+      setError(dict.errors.FailedToPopQueue);
     } finally {
       if (topQueue === "") {
         stopCountdown();
@@ -328,9 +329,7 @@ export default function QuestionsCard({
       console.log("emptyed queue successfully");
     } catch (error) {
       console.error("Error emptying queue:", error);
-      setError(
-        error instanceof Error ? error.message : "Failed to empty queue"
-      );
+      setError(dict.errors.FailedToEmptyQueue);
     } finally {
       popQuestion();
       stopCountdown();
@@ -355,31 +354,18 @@ export default function QuestionsCard({
         } else {
           setPlayers(0);
         }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         setPlayers(0);
-        setError("Failed to fetch player count");
+        setError(dict.errors.FailedToFetchPlayerCount);
       }
     };
     fetchPlayersCount();
-  }, [roomId]);
+  }, [dict.errors.FailedToFetchPlayerCount, roomId]);
 
   // Show error state
   if (pusherError) {
-    return (
-      <div className="flex flex-col min-h-screen w-full h-full bg-red-100 p-4 items-center justify-center">
-        <div className="bg-red-500 text-white p-4 rounded-lg text-center max-w-md">
-          <h3 className="font-bold mb-2">Connection Error</h3>
-          <p className="mb-4">{pusherError.message}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="bg-white text-red-500 px-4 py-2 rounded hover:bg-gray-100"
-          >
-            Refresh Page
-          </button>
-        </div>
-      </div>
-    );
+    return <PusherError dict={dict} pusherError={pusherError.message} />;
   }
 
   return (
@@ -395,7 +381,7 @@ export default function QuestionsCard({
       <div className="flex flex-col justify-between text-center mb-4">
         <h1 className="text-xl font-bold mb-6 text-text-primary text-start">
           {dict.question}:{" "}
-          {questions ? questions.question : dict.no_more_questions}
+          {questions ? questions.question : dict.errors.noMoreQuestions}
         </h1>
         <h1 className="text-xl font-bold mb-6 text-text-primary text-start">
           {dict.answer}: {questions ? questions.answer : "-"}
@@ -426,15 +412,11 @@ export default function QuestionsCard({
         )}
         <div className="flex flex-col gap-4">
           {error && (
-            <div className="bg-red-500 text-white p-2 text-center">
-              {error}
-              <button
-                onClick={() => setError(null)}
-                className="ml-2 text-xs underline"
-              >
-                Dismiss
-              </button>
-            </div>
+            <ErrorAlert
+              message={error}
+              onDismiss={() => setError(null)}
+              dict={dict}
+            />
           )}
           <button
             disabled={correctIsLoading || !questions}

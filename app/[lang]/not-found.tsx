@@ -4,9 +4,9 @@ import { getDictionary } from "./dictionaries";
 export default async function NotFound({
   params,
 }: {
-  params: { lang: "ar" | "en" };
-}) {
-  const { lang } = await params;
+  params?: { lang?: "ar" | "en" };
+} = {}) {
+  const lang = params?.lang || "ar";
   const dict = await getDictionary(lang);
   return (
     <div className="flex flex-col items-center justify-center p-8 min-h-screen bg-backgroundLight text-textPrimary">

@@ -5,6 +5,9 @@ import { usePusherSubscribe } from "@/hooks/usePusherSubscribe";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AutoTextSize } from "auto-text-size";
+import PusherError from "@/components/PusherError";
+import { Dict } from "@/types/dict";
+import ErrorAlert from "@/components/ErrorAlert";
 
 interface Player {
   player: string;
@@ -14,7 +17,7 @@ interface Player {
 interface PlayersProps {
   roomId: string;
   lang: "ar" | "en";
-  dict: Record<string, string>;
+  dict: Dict;
 }
 
 const Players = ({ roomId, dict, lang }: PlayersProps) => {
@@ -52,23 +55,24 @@ const Players = ({ roomId, dict, lang }: PlayersProps) => {
         console.log("got leaderboard successfully");
       } catch (error) {
         console.error("Error getting leaderboard:", error);
-        setError(
-          error instanceof Error ? error.message : "Failed to get leaderboard"
-        );
+        setError(dict.errors.FailedToGetLeaderboard);
       }
     };
     fetchLeaderboard();
-  }, [roomId]);
+  }, [dict.errors.FailedToGetLeaderboard, roomId]);
 
-  const handleList = useCallback((data: Player[]) => {
-    try {
-      console.log("leaderboard received:", data); // Debug log
-      setPlayers(data);
-    } catch (err) {
-      console.error("Error handling players:", err);
-      setError("Failed to get player status");
-    }
-  }, []);
+  const handleList = useCallback(
+    (data: Player[]) => {
+      try {
+        console.log("leaderboard received:", data); // Debug log
+        setPlayers(data);
+      } catch (err) {
+        console.error("Error handling players:", err);
+        setError(dict.errors.failedToGetStatus);
+      }
+    },
+    [dict.errors.failedToGetStatus]
+  );
 
   usePusherBind(channel, "leader-board", handleList);
 
@@ -89,10 +93,10 @@ const Players = ({ roomId, dict, lang }: PlayersProps) => {
         }, 60000);
       } catch (err) {
         console.error("Error ending game:", err);
-        setError("Failed to end game");
+        setError(dict.errors.failedToEndGame);
       }
     },
-    [lang, router]
+    [dict.errors.failedToEndGame, lang, router]
   );
 
   usePusherBind(channel, "end-game", handelGameEnd);
@@ -102,34 +106,17 @@ const Players = ({ roomId, dict, lang }: PlayersProps) => {
 
   // Show error state
   if (pusherError) {
-    return (
-      <div className="flex flex-col min-h-screen w-full h-full bg-red-100 p-4 items-center justify-center">
-        <div className="bg-red-500 text-white p-4 rounded-lg text-center max-w-md">
-          <h3 className="font-bold mb-2">{dict["connectionError"]}</h3>
-          <p className="mb-4">{pusherError.message}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="bg-white text-red-500 px-4 py-2 rounded hover:bg-gray-100"
-          >
-            {dict["refreshPage"]}
-          </button>
-        </div>
-      </div>
-    );
+    return <PusherError dict={dict} pusherError={pusherError.message} />;
   }
 
   return (
     <div className=" w-full h-full">
       {error && (
-        <div className="bg-red-500 text-white p-2 text-center">
-          {error}
-          <button
-            onClick={() => setError(null)}
-            className="ml-2 text-xs underline"
-          >
-            {dict["dismiss"]}
-          </button>
-        </div>
+        <ErrorAlert
+          message={error}
+          onDismiss={() => setError(null)}
+          dict={dict}
+        />
       )}
       {sortedPlayers.length > 0 ? (
         sortedPlayers.map((player, idx) => (
@@ -153,7 +140,9 @@ const Players = ({ roomId, dict, lang }: PlayersProps) => {
           </div>
         ))
       ) : (
-        <p className="text-text-primary text-center">{dict["noPlayers"]}</p>
+        <p className="text-text-primary text-center">
+          {dict.errors.noPlayersInLeaderboard}
+        </p>
       )}
     </div>
   );

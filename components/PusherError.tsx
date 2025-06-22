@@ -1,6 +1,8 @@
+import { Dict } from "../types/dict";
+
 interface PusherError {
-  dict: Record<string, string>;
-  lang: "ar" | "en";
+  dict: Dict;
+  lang?: "ar" | "en";
   pusherError: string;
 }
 

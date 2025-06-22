@@ -1,8 +1,11 @@
 // Buzzer.tsx
 "use client";
 
+import ErrorAlert from "@/components/ErrorAlert";
+import PusherError from "@/components/PusherError";
 import { usePusherBind } from "@/hooks/usePusherBind";
 import { usePusherSubscribe } from "@/hooks/usePusherSubscribe";
+import { Dict } from "@/types/dict";
 import { useState, useCallback, useEffect } from "react";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -15,7 +18,7 @@ interface BuzzerProps {
   roomId: string;
   username: string;
   lang: "ar" | "en";
-  dict: Record<string, string>;
+  dict: Dict;
 }
 
 const Buzzer = ({ roomId, username, dict }: BuzzerProps) => {
@@ -71,13 +74,11 @@ const Buzzer = ({ roomId, username, dict }: BuzzerProps) => {
         console.log(data);
       } catch (error) {
         console.error("Error getting queue:", error);
-        setError(
-          error instanceof Error ? error.message : "Failed to get queue"
-        );
+        setError(dict.errors.FailedToGetQueue);
       }
     };
     fetchQueue();
-  }, [roomId, username, updateBuzzState]);
+  }, [roomId, username, updateBuzzState, dict.errors.FailedToGetQueue]);
 
   const channelName = `room-${roomId}`;
   const { channel, error: pusherError } = usePusherSubscribe(channelName);
@@ -89,10 +90,10 @@ const Buzzer = ({ roomId, username, dict }: BuzzerProps) => {
         updateBuzzState(data);
       } catch (err) {
         console.error("Error handling queue update:", err);
-        setError("Failed to update queue status");
+        setError(dict.errors.FailedToUpdateQueueStatus);
       }
     },
-    [updateBuzzState]
+    [dict.errors.FailedToUpdateQueueStatus, updateBuzzState]
   );
 
   usePusherBind(channel, "buzzer-queue", handleQueueUpdate);
@@ -127,7 +128,7 @@ const Buzzer = ({ roomId, username, dict }: BuzzerProps) => {
       // console.log(data);
     } catch (error) {
       console.error("Error buzzing in:", error);
-      setError(error instanceof Error ? error.message : "Failed to buzz in");
+      setError(dict.errors.FailedToBuzzIn);
     } finally {
       setIsLoading(false);
     }
@@ -135,34 +136,17 @@ const Buzzer = ({ roomId, username, dict }: BuzzerProps) => {
 
   // Show error state
   if (pusherError) {
-    return (
-      <div className="flex flex-col min-h-screen w-full h-full bg-red-100 p-4 items-center justify-center">
-        <div className="bg-red-500 text-white p-4 rounded-lg text-center max-w-md">
-          <h3 className="font-bold mb-2">{dict["connectionErrorTitle"]}</h3>
-          <p className="mb-4">{pusherError.message}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="bg-white text-red-500 px-4 py-2 rounded hover:bg-gray-100"
-          >
-            {dict.refreshPage}
-          </button>
-        </div>
-      </div>
-    );
+    return <PusherError dict={dict} pusherError={pusherError.message} />;
   }
 
   return (
     <div className="flex flex-col min-h-screen w-full h-full bg-red-100 p-0">
       {error && (
-        <div className="bg-red-500 text-white p-2 text-center">
-          {error}
-          <button
-            onClick={() => setError(null)}
-            className="ml-2 text-xs underline"
-          >
-            {dict.dismiss}
-          </button>
-        </div>
+        <ErrorAlert
+          message={error}
+          onDismiss={() => setError(null)}
+          dict={dict}
+        />
       )}
       <button
         disabled={buzzedIn || isLoading || !channel}
