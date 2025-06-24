@@ -8,7 +8,6 @@ import { usePusherSubscribe } from "@/hooks/usePusherSubscribe";
 import { Dict } from "@/types/dict";
 import { useState, useCallback, useEffect } from "react";
 
-
 interface BuzzerProps {
   roomId: string;
   username: string;
@@ -16,7 +15,7 @@ interface BuzzerProps {
   dict: Dict;
 }
 
-const Buzzer = ({ roomId, username, dict }: BuzzerProps) => {
+const Buzzer = ({ roomId, username, dict, lang }: BuzzerProps) => {
   const [buzzedIn, setBuzzedIn] = useState(false);
   const [yourTurn, setYourTurn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -92,6 +91,19 @@ const Buzzer = ({ roomId, username, dict }: BuzzerProps) => {
   );
 
   usePusherBind(channel, "buzzer-queue", handleQueueUpdate);
+
+  // Listen for leaderboard updates and redirect if player is not in leaderboard
+  const handleLeaderBoardUpdate = useCallback(
+    (data: { player: string; score: number }[]) => {
+      const playerData = data.find((p) => p.player === username);
+      if (!playerData) {
+        setError(null);
+        window.location.href = `/${lang}/`;
+      }
+    },
+    [username, lang]
+  );
+  usePusherBind(channel, "leader-board", handleLeaderBoardUpdate);
 
   const handleBuzzIn = async () => {
     if (isLoading || buzzedIn) return;

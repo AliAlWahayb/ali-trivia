@@ -30,6 +30,7 @@ fix the lang when redirecrting to any page :done
 fix not found page :done
 fix  ⨯ TypeError: Cannot destructure property 'lang' of '(intermediate value)' as it is undefined. :done
 
-fix dict={dict} 
-fix after player kick bug
+fix dict={dict}  :done
+fix after player kick bug :done
+add logo and title and add phone not turn off the screen :done
 ask ai 

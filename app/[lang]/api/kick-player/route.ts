@@ -39,21 +39,22 @@ export async function POST(request: NextRequest) {
     // Remove the player from the leaderboard
     leaderboard[roomId] = leaderboard[roomId].filter((p) => p.player !== player);
 
-    // Trigger the 'buzzer-queue' event to notify others
+    // Always trigger the 'leader-board' event
     await triggerEvent(`room-${roomId}`, 'leader-board', leaderboard[roomId]);
     console.log(`Leaderboard updated for room ${roomId}`);
     console.log(leaderboard[roomId]);
 
-    // Check if the player is in the roomQueues
-    const playerInRoomQueues = roomQueues[roomId].find((p) => p === player);
-
-    if (playerInRoomQueues) {
-      // Remove the player from the roomQueues
+    // Remove the player from the roomQueues if present
+    let queueChanged = false;
+    if (roomQueues[roomId] && roomQueues[roomId].includes(player)) {
       roomQueues[roomId] = roomQueues[roomId].filter((p) => p !== player);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      queueChanged = true;
       console.log(`Player ${player} removed from room ${roomId} queue`);
-      // Trigger the 'buzzer-queue' event to notify others
-      await triggerEvent(`room-${roomId}`, 'buzzer-queue', roomQueues[roomId]);
     }
+    // Always trigger the 'buzzer-queue' event after a kick
+    await triggerEvent(`room-${roomId}`, 'buzzer-queue', roomQueues[roomId] || []);
+
 
 
     return NextResponse.json({

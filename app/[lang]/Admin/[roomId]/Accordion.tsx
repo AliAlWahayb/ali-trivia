@@ -49,6 +49,8 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
         const data = await response.json();
         if (data.leaderboard.length > 0) {
           setPlayers(data.leaderboard);
+        } else {
+          setPlayers([]);
         }
 
         if (!response.ok) {
@@ -113,16 +115,41 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
     a.player.localeCompare(b.player)
   );
 
+  const fetchLeaderboard = async () => {
+    try {
+      const response = await fetch("/api/get-leader-board", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          roomId: roomId,
+        }),
+      });
+      const data = await response.json();
+      if (data.leaderboard.length > 0) {
+        setPlayers(data.leaderboard);
+      } else {
+        setPlayers([]);
+      }
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to get leaderboard");
+      }
+      console.log("got leaderboard successfully");
+      console.log(data);
+    } catch (error) {
+      console.error("Error getting leaderboard:", error);
+      setError(dict.errors.FailedToGetLeaderboard);
+    }
+  };
+
   const handelKick = async (player: string) => {
     if (!(await customConfirm(dict.kickConfirmation, dict.yes, dict.no)))
       return;
-
     if (kickIsLoading) return;
-
     try {
       setKickIsLoading(true);
       setError(null);
-
       const response = await fetch("/api/kick-player", {
         method: "POST",
         headers: {
@@ -133,13 +160,12 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
           roomId: roomId,
         }),
       });
-
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data.error || "Failed to kick player");
       }
-
+      // Force refresh leaderboard after kick
+      await fetchLeaderboard();
       console.log("kicked player successfully");
     } catch (error) {
       console.error("Error kicking player:", error);
@@ -292,7 +318,7 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
 
               <div className=" text-center mt-4">
                 <button
-                disabled={players.length === 0 || endIsLoading}
+                  disabled={players.length === 0 || endIsLoading}
                   onClick={() => handelEnd()}
                   className=" bg-danger text-white font-semibold px-2 py-0.5 rounded-lg  hover:bg-primary hover:text-white transition duration-300 transform active:scale-95"
                 >

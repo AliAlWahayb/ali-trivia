@@ -48,10 +48,42 @@ const Score = ({ roomId, username, dict, lang }: ScoreProps) => {
         setError(dict.errors.failedToGetStatus);
       }
     },
-    [username, dict.errors.playerRemoved, dict.errors.failedToGetStatus, router, lang]
+    [
+      username,
+      dict.errors.playerRemoved,
+      dict.errors.failedToGetStatus,
+      router,
+      lang,
+    ]
   );
 
   usePusherBind(channel, "leader-board", handleList);
+
+  // Listen for queue updates and check if player is still in queue/leaderboard
+  const handleQueueUpdate = useCallback(
+    (queue: string[]) => {
+      if (!queue.includes(username)) {
+        fetch("/api/get-leader-board", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ roomId }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (!data.success || !Array.isArray(data.leaderboard)) return;
+            const playerData = data.leaderboard.find(
+              (p: { player: string }) => p.player === username
+            );
+            if (!playerData) {
+              setError(null);
+              router.push(`/${lang}/`);
+            }
+          });
+      }
+    },
+    [username, roomId, lang, router]
+  );
+  usePusherBind(channel, "buzzer-queue", handleQueueUpdate);
 
   //handle game end
   const handelGameEnd = useCallback(
