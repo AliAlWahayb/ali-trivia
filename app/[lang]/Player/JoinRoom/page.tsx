@@ -5,7 +5,7 @@ import { getDictionary } from "../../dictionaries";
 export default async function JoinRoom({
   params,
 }: {
-  params: { lang: "ar" | "en" };
+  params: Promise<{ lang: "ar" | "en" }>;
 }) {
   const { lang } = await params;
   const dict = await getDictionary(lang);

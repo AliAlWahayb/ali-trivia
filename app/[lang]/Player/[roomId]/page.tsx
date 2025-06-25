@@ -11,7 +11,7 @@ import { getDictionary } from "../../dictionaries";
 export default async function Room({
   params,
 }: {
-  params: { lang: "ar" | "en"; roomId: string };
+  params: Promise<{ lang: "ar" | "en"; roomId: string }>;
 }) {
   const { lang, roomId } = await params;
   const dict = await getDictionary(lang);
@@ -41,7 +41,9 @@ export default async function Room({
               lang={lang}
             />
             <div className="flex-1 flex items-center justify-center text-center">
-              <DynamicText text={payload?.player || dict.errors.UnknownPlayer} />
+              <DynamicText
+                text={payload?.player || dict.errors.UnknownPlayer}
+              />
             </div>
             <div style={{ width: 40 }} />
           </div>

@@ -3,12 +3,13 @@ import "./globals.css";
 import RealFooter from "@/components/RealFooter";
 import { getDictionary } from "./dictionaries";
 import SetCsrfCookie from "./set-csrf-cookie.client";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 // Dynamic metadata based on language
 export async function generateMetadata({
   params,
 }: {
-  params: { lang: "ar" | "en" };
+  params: Promise<{ lang: "ar" | "en" }>;
 }) {
   const meta = {
     en: {
@@ -46,7 +47,7 @@ export default async function RootLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: { lang: "ar" | "en" };
+  params: Promise<{ lang: "ar" | "en" }>;
 }>) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
@@ -57,6 +58,7 @@ export default async function RootLayout({
       >
         <SetCsrfCookie />
         {children}
+        <SpeedInsights />
         <RealFooter lang={lang} dict={dict} />
       </body>
     </html>

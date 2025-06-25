@@ -4,9 +4,7 @@ import { verifyToken } from '@/lib/jwt';
 import { cookies } from 'next/headers';
 import { leaderboard, roomQueues } from '@/lib/roomQueues';
 
-function isValidPlayerName(name: string) {
-  return /^[a-zA-Z0-9_]{3,16}$/.test(name);
-}
+
 function isValidRoomId(roomId: string) {
   return /^\d{4}$/.test(roomId);
 }
@@ -30,9 +28,7 @@ export async function POST(request: NextRequest) {
     if (!isValidRoomId(roomId)) {
       return NextResponse.json({ error: 'Invalid room ID. Must be a 4-digit number.' }, { status: 400 });
     }
-    if (!isValidPlayerName(player)) {
-      return NextResponse.json({ error: 'Invalid player name. Use 3-16 alphanumeric characters or underscores.' }, { status: 400 });
-    }
+
     if (!roomQueues[roomId]) {
       return NextResponse.json({ error: 'Queue not found' }, { status: 400 });
     }

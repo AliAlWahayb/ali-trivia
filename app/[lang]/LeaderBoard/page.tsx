@@ -5,7 +5,7 @@ import BackBtn from "@/components/BackBtn";
 export default async function JoinLeaderBoard({
   params,
 }: {
-  params: { lang: "ar" | "en" };
+  params: Promise<{ lang: "ar" | "en" }>;
 }) {
   const { lang } = await params;
   const dict = await getDictionary(lang);

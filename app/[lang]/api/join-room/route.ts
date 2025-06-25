@@ -4,10 +4,7 @@ import { leaderboard } from "@/lib/roomQueues";
 import { triggerEvent } from "@/lib/pusherServer";
 
 
-function isValidPlayerName(name: string) {
-    // Only allow alphanumeric and underscores, 3-16 chars
-    return /^[a-zA-Z0-9_]{3,16}$/.test(name);
-}
+
 
 function isValidRoomId(roomId: string) {
     // Only allow 4 digit numbers
@@ -23,9 +20,7 @@ export async function POST(request: Request) {
         if (!player || !roomId) {
             return NextResponse.json({ error: "Missing username or roomId" }, { status: 400 });
         }
-        if (!isValidPlayerName(player)) {
-            return NextResponse.json({ error: "Invalid player name. Use 3-16 alphanumeric characters or underscores." }, { status: 400 });
-        }
+        
         if (!isValidRoomId(roomId)) {
             return NextResponse.json({ error: "Invalid room ID. Must be a 4-digit number." }, { status: 400 });
         }

@@ -4,9 +4,7 @@ import { verifyToken } from '@/lib/jwt';
 import { cookies } from 'next/headers';
 import { leaderboard, roomQueues } from '@/lib/roomQueues';
 
-function isValidPlayerName(name: string) {
-  return /^[a-zA-Z0-9_]{3,16}$/.test(name);
-}
+
 function isValidRoomId(roomId: string) {
   return /^\d{4}$/.test(roomId);
 }
@@ -36,9 +34,7 @@ export async function POST(request: NextRequest) {
     if (!player) {
       return NextResponse.json({ error: 'Missing player' }, { status: 400 });
     }
-    if (!isValidPlayerName(player)) {
-      return NextResponse.json({ error: 'Invalid player name. Use 3-16 alphanumeric characters or underscores.' }, { status: 400 });
-    }
+
 
     // Check if the room exists in the leaderboard
     if (!leaderboard[roomId]) {

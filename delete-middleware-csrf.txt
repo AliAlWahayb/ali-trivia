@@ -1,1 +1,0 @@
-This file is a placeholder to request the deletion of middleware-csrf.ts, which is now obsolete after merging CSRF logic into middleware.ts.

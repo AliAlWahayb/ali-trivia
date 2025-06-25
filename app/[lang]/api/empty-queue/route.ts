@@ -1,4 +1,3 @@
-// app/api/empty-queue/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { triggerEvent } from '@/lib/pusherServer';
 import { verifyToken } from '@/lib/jwt';

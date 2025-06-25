@@ -10,7 +10,7 @@ import { getDictionary } from "../../dictionaries";
 export default async function Room({
   params,
 }: {
-  params: { lang: "ar" | "en"; roomId: string };
+  params: Promise<{ lang: "ar" | "en"; roomId: string }>;
 }) {
   const { lang, roomId } = await params;
   const dict = await getDictionary(lang);

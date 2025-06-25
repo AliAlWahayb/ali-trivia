@@ -1,16 +1,10 @@
 import Link from "next/link";
 import { getDictionary } from "../dictionaries";
-import { Dict } from "@/types/dict";
-
-interface NotFoundProps {
-  lang: "ar" | "en";
-  dict: Dict;
-}
 
 export default async function NotFoundPage({
   params,
 }: {
-  params: NotFoundProps;
+  params: Promise<{ lang: "ar" | "en" }>;
 }) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
