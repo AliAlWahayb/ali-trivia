@@ -4,6 +4,7 @@ import PusherError from "@/components/PusherError";
 import { usePusherBind } from "@/hooks/usePusherBind";
 import { usePusherSubscribe } from "@/hooks/usePusherSubscribe";
 import { Dict } from "@/types/dict";
+import { getCsrfToken } from "@/lib/getCsrfToken";
 import { useCallback, useEffect, useState } from "react";
 
 interface Props {
@@ -28,6 +29,7 @@ const Queue = ({ roomId, dict }: Props) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "x-csrf-token": getCsrfToken() || "",
           },
           body: JSON.stringify({
             roomId: roomId,

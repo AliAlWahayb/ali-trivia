@@ -8,6 +8,7 @@ import { AutoTextSize } from "auto-text-size";
 import PusherError from "@/components/PusherError";
 import { Dict } from "@/types/dict";
 import ErrorAlert from "@/components/ErrorAlert";
+import { getCsrfToken } from "@/lib/getCsrfToken";
 
 interface Player {
   player: string;
@@ -37,6 +38,7 @@ const Players = ({ roomId, dict, lang }: PlayersProps) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "x-csrf-token": getCsrfToken() || "",
           },
           body: JSON.stringify({
             roomId: roomId,

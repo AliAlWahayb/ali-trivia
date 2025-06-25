@@ -5,8 +5,9 @@ import { verifyToken } from '@/lib/jwt';
 import { cookies } from 'next/headers';
 import { roomQueues } from '@/lib/roomQueues';
 
-
-
+function isValidRoomId(roomId: string) {
+  return /^\d{4}$/.test(roomId);
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,6 +28,9 @@ export async function POST(request: NextRequest) {
     if (!roomId) {
       return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
     }
+    if (!isValidRoomId(roomId)) {
+      return NextResponse.json({ error: 'Invalid room ID. Must be a 4-digit number.' }, { status: 400 });
+    }
 
     // Check if the queue exists
     if (!roomQueues[roomId]) {
@@ -38,21 +42,19 @@ export async function POST(request: NextRequest) {
     //   return NextResponse.json({ error: 'Queue is empty' }, { status: 400 });
     // }
 
-
     // empty the queue
     roomQueues[roomId] = [];
 
     // Trigger the 'buzzer-queue' event to notify others
     await triggerEvent(`room-${roomId}`, 'buzzer-queue', roomQueues[roomId]);
-    console.log(`queue emptyed for room ${roomId}`);
-    console.log(roomQueues[roomId]);
 
     return NextResponse.json({
       success: true,
       queue: roomQueues[roomId],
     });
-  } catch (error) {
-    console.error('Error in empty-queue API:', error);
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+// TODO: Add rate limiting and CSRF protection middleware for this endpoint in production.

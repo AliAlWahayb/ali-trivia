@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import RealFooter from "@/components/RealFooter";
 import { getDictionary } from "./dictionaries";
+import SetCsrfCookie from "./set-csrf-cookie.client";
 
 // Dynamic metadata based on language
 export async function generateMetadata({
@@ -54,6 +55,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <SetCsrfCookie />
         {children}
         <RealFooter lang={lang} dict={dict} />
       </body>

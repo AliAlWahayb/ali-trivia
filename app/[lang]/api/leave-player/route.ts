@@ -5,8 +5,12 @@ import { verifyToken } from '@/lib/jwt';
 import { cookies } from 'next/headers';
 import { leaderboard, roomQueues } from '@/lib/roomQueues';
 
-
-
+function isValidPlayerName(name: string) {
+  return /^[a-zA-Z0-9_]{3,16}$/.test(name);
+}
+function isValidRoomId(roomId: string) {
+  return /^\d{4}$/.test(roomId);
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,6 +31,15 @@ export async function POST(request: NextRequest) {
     if (!roomId) {
       return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
     }
+    if (!isValidRoomId(roomId)) {
+      return NextResponse.json({ error: 'Invalid room ID. Must be a 4-digit number.' }, { status: 400 });
+    }
+    if (!player) {
+      return NextResponse.json({ error: 'Missing player' }, { status: 400 });
+    }
+    if (!isValidPlayerName(player)) {
+      return NextResponse.json({ error: 'Invalid player name. Use 3-16 alphanumeric characters or underscores.' }, { status: 400 });
+    }
 
     // Check if the room exists in the leaderboard
     if (!leaderboard[roomId]) {
@@ -40,14 +53,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Player not in the leaderboard' }, { status: 400 });
     }
 
-
     // Remove the player from the leaderboard
     leaderboard[roomId] = leaderboard[roomId].filter((p) => p.player !== player);
 
     // Trigger the 'leader-board' event to notify others
     await triggerEvent(`room-${roomId}`, 'leader-board', leaderboard[roomId]);
-    console.log(`Leaderboard updated for room ${roomId}`);
-    console.log(leaderboard[roomId]);
 
     // Check if the player is in the roomQueues
     const playerInRoomQueues = roomQueues[roomId].find((p) => p === player);
@@ -55,18 +65,16 @@ export async function POST(request: NextRequest) {
     if (playerInRoomQueues) {
       // Remove the player from the roomQueues
       roomQueues[roomId] = roomQueues[roomId].filter((p) => p !== player);
-      console.log(`Player ${player} removed from room ${roomId} queue`);
       // Trigger the 'buzzer-queue' event to notify others
       await triggerEvent(`room-${roomId}`, 'buzzer-queue', roomQueues[roomId]);
     }
 
-
-
     return NextResponse.json({
       success: true,
     });
-  } catch (error) {
-    console.error('Error in leave player API:', error);
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+// TODO: Add rate limiting and CSRF protection middleware for this endpoint in production.

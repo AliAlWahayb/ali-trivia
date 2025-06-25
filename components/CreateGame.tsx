@@ -2,6 +2,7 @@
 
 import { Dict } from "@/types/dict";
 import { useRouter } from "next/navigation";
+import { getCsrfToken } from "@/lib/getCsrfToken";
 
 interface CreateGameProps {
   lang: "ar" | "en";
@@ -19,6 +20,9 @@ const CreateGame = ({ dict, lang }: CreateGameProps) => {
       // Fetch request with FormData (Content-Type is automatically set to multipart/form-data)
       const response = await fetch("/api/create-room", {
         method: "POST",
+        headers: {
+          "x-csrf-token": getCsrfToken() || "",
+        },
       });
 
       if (!response.ok) {

@@ -7,6 +7,7 @@ import { usePusherBind } from "@/hooks/usePusherBind";
 import { usePusherSubscribe } from "@/hooks/usePusherSubscribe";
 import { Dict } from "@/types/dict";
 import { useState, useCallback, useEffect } from "react";
+import { getCsrfToken } from "@/lib/getCsrfToken";
 
 interface BuzzerProps {
   roomId: string;
@@ -48,10 +49,9 @@ const Buzzer = ({ roomId, username, dict, lang }: BuzzerProps) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "x-csrf-token": getCsrfToken() || "",
           },
-          body: JSON.stringify({
-            roomId: roomId,
-          }),
+          body: JSON.stringify({ roomId }),
         });
 
         const data = await response.json();
@@ -116,11 +116,9 @@ const Buzzer = ({ roomId, username, dict, lang }: BuzzerProps) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "x-csrf-token": getCsrfToken() || "",
         },
-        body: JSON.stringify({
-          player: username,
-          roomId: roomId,
-        }),
+        body: JSON.stringify({ roomId, player: username }),
       });
 
       const data = await response.json();

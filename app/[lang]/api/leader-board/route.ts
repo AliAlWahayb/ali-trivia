@@ -2,6 +2,13 @@ import { signToken } from "@/lib/jwt";
 import { leaderboard } from "@/lib/roomQueues";
 import { NextResponse } from "next/server";
 
+// TODO: Add rate limiting and CSRF protection middleware for this endpoint in production.
+
+function isValidRoomId(roomId: string) {
+    // Only allow 4 digit numbers
+    return /^\d{4}$/.test(roomId);
+}
+
 export async function POST(request: Request) {
     try {
         const formData = await request.formData();
@@ -9,6 +16,9 @@ export async function POST(request: Request) {
 
         if (!roomId) {
             return NextResponse.json({ error: "Missing roomId" }, { status: 400 });
+        }
+        if (!isValidRoomId(roomId)) {
+            return NextResponse.json({ error: "Invalid room ID. Must be a 4-digit number." }, { status: 400 });
         }
 
         const token = signToken({
@@ -25,8 +35,7 @@ export async function POST(request: Request) {
         const response = NextResponse.json({ success: true, roomId });
         response.headers.set("Set-Cookie", `token=${token}; HttpOnly; Path=/; Max-Age=3600`);
         return response;
-    } catch (err) {
-        console.error("Error joining leaderboard:", err);
+    } catch {
         return NextResponse.json({ error: "Failed to join leaderboard" }, { status: 500 });
     }
 }

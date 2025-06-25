@@ -4,6 +4,10 @@ import { cookies } from 'next/headers';
 import { leaderboard, roomQueues } from '@/lib/roomQueues';
 import { triggerEvent } from '@/lib/pusherServer';
 
+function isValidRoomId(roomId: string) {
+  return /^\d{4}$/.test(roomId);
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Get token from cookies instead of Authorization header
@@ -21,6 +25,10 @@ export async function POST(request: NextRequest) {
     // Ensure the data is correct
     if (!roomId) {
       return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
+    }
+
+    if (!isValidRoomId(roomId)) {
+      return NextResponse.json({ error: 'Invalid room ID. Must be a 4-digit number.' }, { status: 400 });
     }
 
     if (!leaderboard[roomId]) {
@@ -49,12 +57,11 @@ export async function POST(request: NextRequest) {
 
     // Trigger the 'end-game' event to notify others
     await triggerEvent(`room-${roomId}`, 'end-game', {});
-    console.log(`Triggered 'end-game' event for room ${roomId}`);
-    console.log('Top score player:', topScorePlayer);
 
     return response;
-  } catch (error) {
-    console.error('Error in end game API:', error);
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+// TODO: Add rate limiting and CSRF protection middleware for this endpoint in production.

@@ -5,6 +5,7 @@ import PusherError from "@/components/PusherError";
 import { usePusherBind } from "@/hooks/usePusherBind";
 import { usePusherSubscribe } from "@/hooks/usePusherSubscribe";
 import { Dict } from "@/types/dict";
+import { getCsrfToken } from "@/lib/getCsrfToken";
 import { useCallback, useEffect, useState } from "react";
 import Countdown, { zeroPad } from "react-countdown";
 
@@ -241,6 +242,7 @@ export default function QuestionsCard({ roomId, dict }: QuestionsCardProps) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "x-csrf-token": getCsrfToken() || "",
         },
         body: JSON.stringify({
           player: topQueue,
@@ -280,10 +282,9 @@ export default function QuestionsCard({ roomId, dict }: QuestionsCardProps) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "x-csrf-token": getCsrfToken() || "",
         },
-        body: JSON.stringify({
-          roomId: roomId,
-        }),
+        body: JSON.stringify({ roomId }),
       });
 
       const data = await response.json();
@@ -317,10 +318,9 @@ export default function QuestionsCard({ roomId, dict }: QuestionsCardProps) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "x-csrf-token": getCsrfToken() || "",
         },
-        body: JSON.stringify({
-          roomId: roomId,
-        }),
+        body: JSON.stringify({ roomId }),
       });
 
       const data = await response.json();
@@ -348,6 +348,7 @@ export default function QuestionsCard({ roomId, dict }: QuestionsCardProps) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "x-csrf-token": getCsrfToken() || "",
           },
           body: JSON.stringify({ roomId }),
         });

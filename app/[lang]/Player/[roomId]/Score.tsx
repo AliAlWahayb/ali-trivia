@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import PusherError from "@/components/PusherError";
 import { Dict } from "@/types/dict";
+import { getCsrfToken } from "@/lib/getCsrfToken";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface Player {
@@ -65,7 +66,10 @@ const Score = ({ roomId, username, dict, lang }: ScoreProps) => {
       if (!queue.includes(username)) {
         fetch("/api/get-leader-board", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "x-csrf-token": getCsrfToken() || "",
+          },
           body: JSON.stringify({ roomId }),
         })
           .then((res) => res.json())
@@ -121,6 +125,7 @@ const Score = ({ roomId, username, dict, lang }: ScoreProps) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "x-csrf-token": getCsrfToken() || "",
           },
           body: JSON.stringify({ roomId }),
         });

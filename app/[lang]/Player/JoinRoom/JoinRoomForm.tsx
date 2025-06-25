@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import ErrorAlert from "@/components/ErrorAlert";
 import { Dict } from "@/types/dict";
+import { getCsrfToken } from "@/lib/getCsrfToken";
 
 interface JoinRoomFormData {
   roomCode: string;
@@ -38,6 +39,9 @@ export default function JoinRoomForm({ dict, lang }: JoinRoomFormProps) {
       const roomRes = await fetch("/api/join-room", {
         method: "POST",
         body: formData,
+        headers: {
+          "x-csrf-token": getCsrfToken() || "",
+        },
       });
       const roomResult = await roomRes.json();
       console.log(roomResult);
@@ -79,7 +83,8 @@ export default function JoinRoomForm({ dict, lang }: JoinRoomFormProps) {
                 value: /^\d{4}$/,
                 message: dict.errors.roomCodeError,
               },
-              validate: (value) => value.length === 4 || dict.errors.roomCodeError,
+              validate: (value) =>
+                value.length === 4 || dict.errors.roomCodeError,
             })}
             onInput={(e) => {
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment

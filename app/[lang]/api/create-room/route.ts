@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { signToken } from "@/lib/jwt";
 import { leaderboard, roomQueues } from "@/lib/roomQueues";
 
+// TODO: Add rate limiting and CSRF protection middleware for this endpoint in production.
+// TODO: Remove or sanitize logs before deploying to production.
+
 export async function POST() {
     // Generate a unique 4-digit room ID that doesn't exist in the leaderboard
     let roomId;

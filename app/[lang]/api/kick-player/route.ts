@@ -5,9 +5,12 @@ import { verifyToken } from '@/lib/jwt';
 import { cookies } from 'next/headers';
 import { leaderboard, roomQueues } from '@/lib/roomQueues';
 
-
-
-
+function isValidPlayerName(name: string) {
+  return /^[a-zA-Z0-9_]{3,16}$/.test(name);
+}
+function isValidRoomId(roomId: string) {
+  return /^\d{4}$/.test(roomId);
+}
 export async function POST(request: NextRequest) {
   try {
     // Get token from cookies instead of Authorization header
@@ -27,6 +30,15 @@ export async function POST(request: NextRequest) {
     if (!roomId) {
       return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
     }
+    if (!isValidRoomId(roomId)) {
+      return NextResponse.json({ error: 'Invalid room ID. Must be a 4-digit number.' }, { status: 400 });
+    }
+    if (!player) {
+      return NextResponse.json({ error: 'Missing player' }, { status: 400 });
+    }
+    if (!isValidPlayerName(player)) {
+      return NextResponse.json({ error: 'Invalid player name. Use 3-16 alphanumeric characters or underscores.' }, { status: 400 });
+    }
 
     // Check if the player is in the leaderboard
     const playerInLeaderboard = leaderboard[roomId].find((p) => p.player === player);
@@ -41,8 +53,9 @@ export async function POST(request: NextRequest) {
 
     // Always trigger the 'leader-board' event
     await triggerEvent(`room-${roomId}`, 'leader-board', leaderboard[roomId]);
-    console.log(`Leaderboard updated for room ${roomId}`);
-    console.log(leaderboard[roomId]);
+    // Remove sensitive logs
+    // console.log(`Leaderboard updated for room ${roomId}`);
+    // console.log(leaderboard[roomId]);
 
     // Remove the player from the roomQueues if present
     let queueChanged = false;
@@ -50,7 +63,7 @@ export async function POST(request: NextRequest) {
       roomQueues[roomId] = roomQueues[roomId].filter((p) => p !== player);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       queueChanged = true;
-      console.log(`Player ${player} removed from room ${roomId} queue`);
+      // console.log(`Player ${player} removed from room ${roomId} queue`);
     }
     // Always trigger the 'buzzer-queue' event after a kick
     await triggerEvent(`room-${roomId}`, 'buzzer-queue', roomQueues[roomId] || []);
@@ -61,8 +74,8 @@ export async function POST(request: NextRequest) {
       success: true,
       queue: leaderboard[roomId],
     });
-  } catch (error) {
-    console.error('Error in kick player API:', error);
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+// TODO: Add rate limiting and CSRF protection middleware for this endpoint in production.

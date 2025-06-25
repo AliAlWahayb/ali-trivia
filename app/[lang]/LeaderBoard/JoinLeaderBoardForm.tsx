@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import ErrorAlert from "@/components/ErrorAlert";
 import { Dict } from "@/types/dict";
+import { getCsrfToken } from "@/lib/getCsrfToken";
 
 interface JoinLeaderBoardFormData {
   roomCode: string;
@@ -36,6 +37,9 @@ export default function JoinLeaderBoardForm({
     formData.append("roomId", data.roomCode);
     const res = await fetch("/api/leader-board", {
       method: "POST",
+      headers: {
+        "x-csrf-token": getCsrfToken() || "",
+      },
       body: formData,
     });
     const result = await res.json();

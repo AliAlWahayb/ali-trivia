@@ -5,6 +5,7 @@ import PusherError from "@/components/PusherError";
 import { usePusherBind } from "@/hooks/usePusherBind";
 import { usePusherSubscribe } from "@/hooks/usePusherSubscribe";
 import { Dict } from "@/types/dict";
+import { getCsrfToken } from "@/lib/getCsrfToken";
 import * as Accordion from "@radix-ui/react-accordion";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 import { AutoTextSize } from "auto-text-size";
@@ -40,10 +41,9 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "x-csrf-token": getCsrfToken() || "",
           },
-          body: JSON.stringify({
-            roomId: roomId,
-          }),
+          body: JSON.stringify({ roomId: roomId }),
         });
 
         const data = await response.json();
@@ -121,10 +121,9 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "x-csrf-token": getCsrfToken() || "",
         },
-        body: JSON.stringify({
-          roomId: roomId,
-        }),
+        body: JSON.stringify({ roomId: roomId }),
       });
       const data = await response.json();
       if (data.leaderboard.length > 0) {
@@ -154,6 +153,7 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "x-csrf-token": getCsrfToken() || "",
         },
         body: JSON.stringify({
           player: player,
@@ -189,10 +189,9 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "x-csrf-token": getCsrfToken() || "",
         },
-        body: JSON.stringify({
-          roomId: roomId,
-        }),
+        body: JSON.stringify({ roomId }),
       });
 
       const data = await response.json();

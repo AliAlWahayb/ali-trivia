@@ -4,8 +4,9 @@ import { verifyToken } from '@/lib/jwt';
 import { cookies } from 'next/headers';
 import { leaderboard } from '@/lib/roomQueues';
 
-
-
+function isValidRoomId(roomId: string) {
+  return /^\d{4}$/.test(roomId);
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,10 +23,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { roomId } = body;
 
-
     // Ensure the data is correct
     if (!roomId) {
       return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
+    }
+
+    if (!isValidRoomId(roomId)) {
+      return NextResponse.json({ error: 'Invalid room ID. Must be a 4-digit number.' }, { status: 400 });
     }
 
     // Check if the leaderboard exists
@@ -35,18 +39,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
-
-
-
-    console.log(`Leaderboard for room ${roomId}`);
-    console.log(leaderboard[roomId]);
-
     return NextResponse.json({
       success: true,
       leaderboard: leaderboard[roomId],
     });
-  } catch (error) {
-    console.error('Error in getting leaderboard from API:', error);
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+// TODO: Add rate limiting and CSRF protection middleware for this endpoint in production.

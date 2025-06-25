@@ -8,6 +8,13 @@ import { leaderboard, roomQueues } from '@/lib/roomQueues';  // Import shared ro
 
 
 
+function isValidPlayerName(name: string) {
+  return /^[a-zA-Z0-9_]{3,16}$/.test(name);
+}
+function isValidRoomId(roomId: string) {
+  return /^\d{4}$/.test(roomId);
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Get token from cookies instead of Authorization header
@@ -22,12 +29,15 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const { roomId, player } = body;
-    console.log(roomQueues);
-    console.log(body);
-
-    // Ensure the data is correct
+    // Input validation
     if (!roomId || !player) {
       return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
+    }
+    if (!isValidRoomId(roomId)) {
+      return NextResponse.json({ error: 'Invalid room ID. Must be a 4-digit number.' }, { status: 400 });
+    }
+    if (!isValidPlayerName(player)) {
+      return NextResponse.json({ error: 'Invalid player name. Use 3-16 alphanumeric characters or underscores.' }, { status: 400 });
     }
 
     // Check if the queue exists
@@ -58,8 +68,8 @@ export async function POST(request: NextRequest) {
       success: true,
       queue: roomQueues[roomId],
     });
-  } catch (error) {
-    console.error('Error in trigger-buzzer API:', error);
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+// TODO: Add rate limiting and CSRF protection middleware for this endpoint in production.
