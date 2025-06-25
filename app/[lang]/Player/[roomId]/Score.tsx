@@ -32,7 +32,6 @@ const Score = ({ roomId, username, dict, lang }: ScoreProps) => {
   const handleList = useCallback(
     (data: { player: string; score: number }[]) => {
       try {
-        console.log("leaderboard received:", data); // Debug log
         // Find the player object by username
         const playerData = data.find((player) => player.player === username);
         if (playerData) {
@@ -44,8 +43,8 @@ const Score = ({ roomId, username, dict, lang }: ScoreProps) => {
             router.push(`/${lang}/`);
           }, 7000);
         }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
-        console.error("Error handling players:", err);
         setError(dict.errors.failedToGetStatus);
       }
     },
@@ -91,9 +90,8 @@ const Score = ({ roomId, username, dict, lang }: ScoreProps) => {
 
   //handle game end
   const handelGameEnd = useCallback(
-    async (data: string) => {
+    async () => {
       try {
-        console.log("game ended", data);
 
         document.cookie = "token=; Max-Age=0; path=/";
 
@@ -106,8 +104,8 @@ const Score = ({ roomId, username, dict, lang }: ScoreProps) => {
         setTimeout(() => {
           router.push(`/${lang}/`);
         }, 7000);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
-        console.error("Error ending game:", err);
         setError(dict.errors.failedToEndGame);
       }
     },
@@ -119,7 +117,6 @@ const Score = ({ roomId, username, dict, lang }: ScoreProps) => {
   // Fetch player score on mount
   useEffect(() => {
     const fetchPlayerScore = async () => {
-      console.log("Fetching player score for:", username);
       try {
         const response = await fetch("/api/get-leader-board", {
           method: "POST",

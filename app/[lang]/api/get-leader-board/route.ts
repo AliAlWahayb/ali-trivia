@@ -1,4 +1,3 @@
-// app/api/trigger-buzzer/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/jwt';
 import { cookies } from 'next/headers';
@@ -48,4 +47,3 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// TODO: Add rate limiting and CSRF protection middleware for this endpoint in production.

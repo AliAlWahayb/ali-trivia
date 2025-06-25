@@ -1,4 +1,3 @@
-// lib/pusherServer.ts
 import Pusher from 'pusher';
 
 const pusher = new Pusher({
@@ -10,10 +9,5 @@ const pusher = new Pusher({
 });
 
 export const triggerEvent = async (channelName: string, eventName: string, data: object) => {
-  try {
-    await pusher.trigger(channelName, eventName, data);
-  } catch (error) {
-    console.error('Error triggering Pusher event:', error);
-    throw error;
-  }
+  await pusher.trigger(channelName, eventName, data);
 };

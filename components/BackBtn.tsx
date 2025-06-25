@@ -10,7 +10,7 @@ interface BackBtnProps {
   role?: string;
   name?: string;
   roomId?: string;
-  noConfirm?: boolean; // Optional prop to skip confirmation
+  noConfirm?: boolean; // prop to skip confirmation
   dict: Dict;
   lang: "ar" | "en";
 }
@@ -30,10 +30,7 @@ const handleEnd = async (roomId: string) => {
     if (!response.ok) {
       throw new Error(data.error || "Failed to end game");
     }
-    console.log("Ended game successfully");
-  } catch (error) {
-    console.error("Error ending game:", error);
-  }
+  } catch {}
 };
 
 // Handles leaving the game for player
@@ -51,10 +48,7 @@ const handleLeave = async (player: string, roomId: string) => {
     if (!response.ok) {
       throw new Error(data.error || "Failed to leave player");
     }
-    console.log("Left player successfully");
-  } catch (error) {
-    console.error("Error leaving player:", error);
-  }
+  } catch {}
 };
 
 const BackBtn = ({

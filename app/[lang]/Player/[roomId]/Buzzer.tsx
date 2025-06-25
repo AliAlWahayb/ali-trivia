@@ -1,4 +1,3 @@
-// Buzzer.tsx
 "use client";
 
 import ErrorAlert from "@/components/ErrorAlert";
@@ -55,7 +54,6 @@ const Buzzer = ({ roomId, username, dict, lang }: BuzzerProps) => {
         });
 
         const data = await response.json();
-        console.log("Queue data:", data); // Debug log
         if (data.success && Array.isArray(data.queue)) {
           updateBuzzState(data.queue);
         }
@@ -64,10 +62,8 @@ const Buzzer = ({ roomId, username, dict, lang }: BuzzerProps) => {
           throw new Error(data.error || "Failed to get queue");
         }
 
-        console.log("got queue successfully");
-        console.log(data);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
-        console.error("Error getting queue:", error);
         setError(dict.errors.FailedToGetQueue);
       }
     };
@@ -80,10 +76,9 @@ const Buzzer = ({ roomId, username, dict, lang }: BuzzerProps) => {
   const handleQueueUpdate = useCallback(
     (data: string[]) => {
       try {
-        console.log("Queue update received:", data); // Debug log
         updateBuzzState(data);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
-        console.error("Error handling queue update:", err);
         setError(dict.errors.FailedToUpdateQueueStatus);
       }
     },
@@ -127,12 +122,8 @@ const Buzzer = ({ roomId, username, dict, lang }: BuzzerProps) => {
         throw new Error(data.error || "Failed to buzz in");
       }
 
-      console.log("Buzzed in successfully");
-      // setBuzzedIn(true); //makes the waiting state buggy, so we handle it in the queue update
-      // setYourTurn(data.queue[0] === username);
-      // console.log(data);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error("Error buzzing in:", error);
       setError(dict.errors.FailedToBuzzIn);
     } finally {
       setIsLoading(false);

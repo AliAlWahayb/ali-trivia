@@ -1,4 +1,3 @@
-// components/ErrorBoundary.tsx
 "use client";
 
 import { Dict } from "@/types/dict";
@@ -27,8 +26,8 @@ class ErrorBoundary extends React.Component<
     return { hasError: true, error };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("Error caught by boundary:", error, errorInfo);
   }
 
   render() {

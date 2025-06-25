@@ -44,14 +44,13 @@ export default function QuestionsCard({ roomId, dict }: QuestionsCardProps) {
   const handleCount = useCallback(
     (data: string[]) => {
       try {
-        console.log("leaderboard received:", data); // Debug log
         if (Array.isArray(data)) {
           setPlayers(data.length);
         } else {
           setPlayers(0);
         }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
-        console.error("Error handling player count:", err);
         setError(dict.errors.FailedToUpdatePlayerStatus);
       }
     },
@@ -211,7 +210,6 @@ export default function QuestionsCard({ roomId, dict }: QuestionsCardProps) {
   const handleQueue = useCallback(
     (data: string[]) => {
       try {
-        console.log("Queue update received:", data); // Debug log
         if (!data || data.length === 0) {
           setTopQueue("");
           setDisableBtn(true);
@@ -221,8 +219,8 @@ export default function QuestionsCard({ roomId, dict }: QuestionsCardProps) {
           setDisableBtn(false);
           startCountdown();
         }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
-        console.error("Error handling queue top:", err);
         setError(dict.errors.FailedToUpdateQueueStatus);
       }
     },
@@ -260,9 +258,8 @@ export default function QuestionsCard({ roomId, dict }: QuestionsCardProps) {
       setShouldRestart(false);
       popQuestion();
 
-      console.log("updated score successfully");
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error("Error updating score:", error);
       setError(dict.errors.FailedToUpdateScore);
     } finally {
       setCorrectIsLoading(false);
@@ -293,9 +290,8 @@ export default function QuestionsCard({ roomId, dict }: QuestionsCardProps) {
         throw new Error(data.error || "Failed to pop queue");
       }
 
-      console.log("popped queue successfully");
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error("Error popping queue:", error);
       setError(dict.errors.FailedToPopQueue);
     } finally {
       if (topQueue === "") {
@@ -329,9 +325,8 @@ export default function QuestionsCard({ roomId, dict }: QuestionsCardProps) {
         throw new Error(data.error || "Failed to empty queue");
       }
 
-      console.log("emptyed queue successfully");
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error("Error emptying queue:", error);
       setError(dict.errors.FailedToEmptyQueue);
     } finally {
       popQuestion();
@@ -403,7 +398,6 @@ export default function QuestionsCard({ roomId, dict }: QuestionsCardProps) {
               </h1>
             )}
             onComplete={() => {
-              console.log("Countdown completed!");
               if (shouldRestart) {
                 setTimeout(startCountdown, 500); // Small delay for UX
               }

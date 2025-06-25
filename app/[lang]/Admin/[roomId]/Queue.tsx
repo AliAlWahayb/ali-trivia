@@ -45,10 +45,8 @@ const Queue = ({ roomId, dict }: Props) => {
           throw new Error(data.error || "Failed to get queue");
         }
 
-        console.log("got queue successfully");
-        console.log(data.queue);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
-        console.error("Error getting queue:", error);
         setError(dict.errors.FailedToGetQueue);
       }
     };
@@ -58,14 +56,13 @@ const Queue = ({ roomId, dict }: Props) => {
   const handleQueue = useCallback(
     (data: string[]) => {
       try {
-        console.log("Queue update received:", data); // Debug log
         if (!data || data.length === 0) {
           setQueue([]);
         } else {
           setQueue(data);
         }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
-        console.error("Error handling queue update:", err);
         setError(dict.errors.FailedToUpdateQueueStatus);
       }
     },

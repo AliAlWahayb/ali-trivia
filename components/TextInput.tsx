@@ -1,11 +1,9 @@
-// components/TextInput.tsx
 import React from "react";
 
 interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   id: string;
   dict?: Record<string, string>;
-  // All other input props like type, placeholder, required, etc., are passed via ...props
 }
 
 const TextInput: React.FC<TextInputProps> = ({

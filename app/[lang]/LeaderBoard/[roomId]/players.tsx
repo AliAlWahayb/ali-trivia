@@ -54,9 +54,8 @@ const Players = ({ roomId, dict, lang }: PlayersProps) => {
           throw new Error(data.error || "Failed to get leaderboard");
         }
 
-        console.log("got leaderboard successfully");
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
-        console.error("Error getting leaderboard:", error);
         setError(dict.errors.FailedToGetLeaderboard);
       }
     };
@@ -66,10 +65,9 @@ const Players = ({ roomId, dict, lang }: PlayersProps) => {
   const handleList = useCallback(
     (data: Player[]) => {
       try {
-        console.log("leaderboard received:", data); // Debug log
         setPlayers(data);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
-        console.error("Error handling players:", err);
         setError(dict.errors.failedToGetStatus);
       }
     },
@@ -80,9 +78,8 @@ const Players = ({ roomId, dict, lang }: PlayersProps) => {
 
   //handle game end
   const handelGameEnd = useCallback(
-    async (data: string) => {
+    async () => {
       try {
-        console.log("game ended", data);
 
         document.cookie = "token=; Max-Age=0; path=/";
 
@@ -93,8 +90,8 @@ const Players = ({ roomId, dict, lang }: PlayersProps) => {
         setTimeout(() => {
           router.push(`/${lang}/`);
         }, 60000);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
-        console.error("Error ending game:", err);
         setError(dict.errors.failedToEndGame);
       }
     },

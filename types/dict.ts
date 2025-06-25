@@ -1,5 +1,4 @@
-// This type is generated from your en.json dictionary for full type safety.
-// If you add new keys to the dictionary, re-run this generation or update manually.
+
 
 export interface ErrorsDict {
     FailedToBuzzIn: string;

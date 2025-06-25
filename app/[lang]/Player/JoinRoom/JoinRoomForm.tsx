@@ -44,21 +44,18 @@ export default function JoinRoomForm({ dict, lang }: JoinRoomFormProps) {
         },
       });
       const roomResult = await roomRes.json();
-      console.log(roomResult);
 
       if (roomResult.error) {
-        console.error("Error joining room:", roomResult.error);
         setError(dict.errors.connectionError);
         return;
       }
 
-      console.log("Joined room successfully:", roomResult);
 
       // 2. Redirect to the player's room
 
       router.push(`/${lang}/Player/${roomResult.roomId}`);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error("Error:", error);
     }
   };
 

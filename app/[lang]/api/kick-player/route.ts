@@ -1,4 +1,3 @@
-// app/api/kick-player/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { triggerEvent } from '@/lib/pusherServer';
 import { verifyToken } from '@/lib/jwt';
@@ -53,9 +52,6 @@ export async function POST(request: NextRequest) {
 
     // Always trigger the 'leader-board' event
     await triggerEvent(`room-${roomId}`, 'leader-board', leaderboard[roomId]);
-    // Remove sensitive logs
-    // console.log(`Leaderboard updated for room ${roomId}`);
-    // console.log(leaderboard[roomId]);
 
     // Remove the player from the roomQueues if present
     let queueChanged = false;
@@ -78,4 +74,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-// TODO: Add rate limiting and CSRF protection middleware for this endpoint in production.

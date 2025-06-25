@@ -17,7 +17,6 @@ const CreateGame = ({ dict, lang }: CreateGameProps) => {
       localStorage.removeItem("trivia-questions");
     }
     try {
-      // Fetch request with FormData (Content-Type is automatically set to multipart/form-data)
       const response = await fetch("/api/create-room", {
         method: "POST",
         headers: {
@@ -31,14 +30,10 @@ const CreateGame = ({ dict, lang }: CreateGameProps) => {
       }
 
       const result = await response.json();
-      console.log("Room created successfully:", result);
 
-      // Redirect to the admin game master dashboard using the actual roomId from the server response
       router.push(`/${lang}/Admin/${result.roomId}`);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
     } catch (error: any) {
-      console.error("Failed to create room:", error);
-      alert(`${dict.errors.dangerAlert}\n${error.message}`); // Basic alert for user feedback
     }
   };
 

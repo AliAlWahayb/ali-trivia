@@ -3,8 +3,6 @@ import { signToken } from "@/lib/jwt";
 import { leaderboard } from "@/lib/roomQueues";
 import { triggerEvent } from "@/lib/pusherServer";
 
-// TODO: Add rate limiting and CSRF protection middleware for this endpoint in production.
-// TODO: Remove or sanitize logs before deploying to production.
 
 function isValidPlayerName(name: string) {
     // Only allow alphanumeric and underscores, 3-16 chars
@@ -61,7 +59,6 @@ export async function POST(request: Request) {
         return response;
 
     } catch {
-        // In production, avoid logging sensitive errors. Consider using a monitoring service.
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }

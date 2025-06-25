@@ -57,10 +57,8 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
           throw new Error(data.error || "Failed to get leaderboard");
         }
 
-        console.log("got leaderboard successfully");
-        console.log(data);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
-        console.error("Error getting leaderboard:", error);
         setError(dict.errors.FailedToGetLeaderboard);
       }
     };
@@ -72,9 +70,8 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
 
   //handle game end
   const handelGameEnd = useCallback(
-    async (data: string) => {
+    async () => {
       try {
-        console.log("game ended", data);
 
         document.cookie = "token=; Max-Age=0; path=/";
 
@@ -85,8 +82,8 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
         setTimeout(() => {
           router.push(`/${lang}`);
         }, 60000);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
-        console.error("Error ending game:", err);
         setError(dict.errors.failedToEndGame);
       }
     },
@@ -98,10 +95,9 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
   const handleList = useCallback(
     (data: Player[]) => {
       try {
-        console.log("leaderboard received:", data); // Debug log
         setPlayers(data);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
-        console.error("Error handling players:", err);
         setError(dict.errors.failedToGetStatus);
       }
     },
@@ -134,10 +130,8 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
       if (!response.ok) {
         throw new Error(data.error || "Failed to get leaderboard");
       }
-      console.log("got leaderboard successfully");
-      console.log(data);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error("Error getting leaderboard:", error);
       setError(dict.errors.FailedToGetLeaderboard);
     }
   };
@@ -166,9 +160,8 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
       }
       // Force refresh leaderboard after kick
       await fetchLeaderboard();
-      console.log("kicked player successfully");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error("Error kicking player:", error);
       setError(dict.errors.FailedToKickPlayer);
     } finally {
       setKickIsLoading(false);
@@ -201,9 +194,8 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
         throw new Error(data.error || "Failed to end game");
       }
 
-      console.log("ended game successfully");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error("Error ending game:", error);
       setError(dict.errors.failedToEndGame);
     } finally {
       setEndIsLoading(false);

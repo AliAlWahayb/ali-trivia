@@ -1,4 +1,3 @@
-// app/api/leave-player/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { triggerEvent } from '@/lib/pusherServer';
 import { verifyToken } from '@/lib/jwt';
@@ -77,4 +76,3 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// TODO: Add rate limiting and CSRF protection middleware for this endpoint in production.

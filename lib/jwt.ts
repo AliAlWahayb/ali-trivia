@@ -1,15 +1,20 @@
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
-const SECRET = process.env.JWT_SECRET! as string;
+function getSecret(): string {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+        throw new Error("JWT_SECRET environment variable is not set.");
+    }
+    return secret;
+}
 
 export function signToken(payload: object) {
-    return jwt.sign(payload, SECRET, { expiresIn: "1h" });
+    return jwt.sign(payload, getSecret(), { expiresIn: "1h" });
 }
 
 export function verifyToken(token: string) {
     try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return jwt.verify(token, SECRET) as any;
+        return jwt.verify(token, getSecret()) as JwtPayload;
     } catch {
         return null;
     }

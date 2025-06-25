@@ -2,7 +2,6 @@ import { signToken } from "@/lib/jwt";
 import { leaderboard } from "@/lib/roomQueues";
 import { NextResponse } from "next/server";
 
-// TODO: Add rate limiting and CSRF protection middleware for this endpoint in production.
 
 function isValidRoomId(roomId: string) {
     // Only allow 4 digit numbers

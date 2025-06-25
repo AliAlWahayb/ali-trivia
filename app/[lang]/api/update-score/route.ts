@@ -1,4 +1,3 @@
-// app/api/update-score/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { triggerEvent } from '@/lib/pusherServer';
 import { verifyToken } from '@/lib/jwt';
@@ -74,20 +73,17 @@ export async function POST(request: NextRequest) {
 
     // Trigger the 'buzzer-queue' event to notify others
     await triggerEvent(`room-${roomId}`, 'buzzer-queue', roomQueues[roomId]);
-    console.log(`queue emptyed for room ${roomId}`);
-    console.log(roomQueues[roomId]);
+
 
     // Trigger the 'leader-board' event to notify others
     await triggerEvent(`room-${roomId}`, 'leader-board', leaderboard[roomId]);
-    console.log(`Leaderboard updated for room ${roomId}`);
-    console.log(leaderboard[roomId]);
 
     return NextResponse.json({
       success: true,
       queue: leaderboard[roomId],
     });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    console.error('Error in update-score API:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

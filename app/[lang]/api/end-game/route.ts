@@ -64,4 +64,3 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// TODO: Add rate limiting and CSRF protection middleware for this endpoint in production.
