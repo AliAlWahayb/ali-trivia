@@ -84,7 +84,7 @@ const Queue = ({ roomId, dict }: Props) => {
         </p>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-1">
         {error && (
           <ErrorAlert
             message={error}

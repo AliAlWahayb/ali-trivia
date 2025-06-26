@@ -45,7 +45,7 @@ change
 
 and remove hover :done
 
-add 3 tries each round only
-move the queue up
+add 3 tries each round only :dropped
+move the queue up :done
 screen hight max = device hight
-make a dummy .env file as example
+make a dummy .env file as example :done
