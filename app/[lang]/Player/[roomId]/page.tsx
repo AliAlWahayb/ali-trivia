@@ -30,9 +30,9 @@ export default async function Room({
 
   return (
     <ErrorBoundary lang={lang} dict={dict}>
-      <div className="flex flex-col items-center justify-baseline  p-5 min-h-screen bg-background-light">
-        <div className="w-full flex flex-col items-center justify-center mb-8">
-          <div className="w-full max-w-xs flex flex-row items-center justify-between mb-6">
+      <div className="flex flex-col items-center justify-baseline  p-5 min-h-1/4 max-h-1/4 h-1/4 bg-background-light">
+        <div className="w-full flex flex-col items-center justify-center mb-2">
+          <div className="w-full max-w-xs flex flex-row items-center justify-between mb-1">
             <BackBtn
               role={payload.role}
               name={payload?.player}
