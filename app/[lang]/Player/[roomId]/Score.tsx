@@ -159,7 +159,7 @@ const Score = ({ roomId, username, dict, lang }: ScoreProps) => {
   return (
     <div>
       {error ? (
-        <p className="text-red-500">{error}</p>
+        <p className="text-danger">{error}</p>
       ) : (
         <h4 className="text-lg font-semibold text-text-secondary">
           {dict.score} {score}

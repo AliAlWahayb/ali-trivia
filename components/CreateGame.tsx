@@ -33,14 +33,13 @@ const CreateGame = ({ dict, lang }: CreateGameProps) => {
 
       router.push(`/${lang}/Admin/${result.roomId}`);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-    } catch (error: any) {
-    }
+    } catch (error: any) {}
   };
 
   return (
     <button
       onClick={onSubmit}
-      className="w-full bg-backgroundLight text-primary text-center font-semibold border-2 border-primary py-4 rounded-lg  hover:bg-primary hover:text-white transition duration-300 transform active:scale-95"
+      className="w-full bg-background-light text-primary text-center font-semibold border-2 border-primary py-4 rounded-lg    transition duration-300 transform active:scale-95"
     >
       {dict.createGame}
     </button>

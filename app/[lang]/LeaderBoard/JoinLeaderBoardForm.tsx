@@ -91,7 +91,7 @@ export default function JoinLeaderBoardForm({
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-primary text-white font-semibold py-3 rounded-lg shadow-md hover:bg-secondary transition duration-300 transform active:scale-95"
+            className="w-full bg-primary text-white font-semibold py-3 rounded-lg shadow-md  transition duration-300 transform active:scale-95"
           >
             {dict.joinLeaderboard}
           </button>

@@ -17,13 +17,13 @@ const TextInput: React.FC<TextInputProps> = ({
     <div className="mb-4">
       <label
         htmlFor={id}
-        className="block text-sm font-medium text-textSecondary mb-2"
+        className="block text-sm font-medium text-text-secondary mb-2"
       >
         {dict ? dict[label] || label : label}
       </label>
       <input
         id={id}
-        className={`w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-200 ${className}`}
+        className={`w-full p-3 border border-muted rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors duration-200 ${className}`}
         placeholder={
           dict && props.placeholder
             ? dict[props.placeholder] || props.placeholder

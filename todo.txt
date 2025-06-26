@@ -33,4 +33,19 @@ fix  ⨯ TypeError: Cannot destructure property 'lang' of '(intermediate value)'
 fix dict={dict}  :done
 fix after player kick bug :done
 add logo and title and add phone not turn off the screen :done
-ask ai 
+ask ai  :done
+
+change
+? "bg-green-500"
+              : "bg-yellow-500"
+            : "bg-blue-500"
+              ? "bg-success"
+              : "bg-warning"
+            : "bg-secondary"
+
+and remove hover :done
+
+add 3 tries each round only
+move the queue up
+screen hight max = device hight
+make a dummy .env file as example

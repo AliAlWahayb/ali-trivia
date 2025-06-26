@@ -77,7 +77,7 @@ const Queue = ({ roomId, dict }: Props) => {
   }
 
   return (
-    <div className="w-full max-w-md bg-gray-100 rounded-lg px-6 py-3 ">
+    <div className="w-full max-w-md bg-card rounded-lg px-6 py-3 ">
       <div className="flex flex-row justify-between ">
         <p className="text-text-primary font-semibold text-lg">
           {dict.buzzerQueue}
@@ -96,7 +96,7 @@ const Queue = ({ roomId, dict }: Props) => {
           queue.map((name, idx) => (
             <div
               key={name + idx}
-              className="flex justify-between items-center mb-2 border-b border-gray-300 pb-1"
+              className="flex justify-between items-center mb-2 border-b border-muted pb-1"
             >
               <p className="text-text-primary ">{name}</p>
             </div>

@@ -368,7 +368,7 @@ export default function QuestionsCard({ roomId, dict }: QuestionsCardProps) {
   }
 
   return (
-    <div className="w-full max-w-md bg-gray-100 rounded-lg  p-6">
+    <div className="w-full max-w-md bg-card rounded-lg  p-6">
       <div className="flex justify-between text-center mb-4">
         <h1 className="text-lg font-bold mb-6 text-text-primary text-start">
           {dict.round} {Round}
@@ -419,21 +419,21 @@ export default function QuestionsCard({ roomId, dict }: QuestionsCardProps) {
           <button
             disabled={correctIsLoading || !questions || disableBtn}
             onClick={handelCorrectAnswer}
-            className="w-full bg-success text-white font-semibold py-2 rounded-lg  hover:bg-primary hover:text-white transition duration-300 transform active:scale-95"
+            className="w-full bg-success text-white font-semibold py-2 rounded-lg    transition duration-300 transform active:scale-95"
           >
             {dict.correctAnswer}
           </button>
           <button
             disabled={wrongIsLoading || !questions || disableBtn}
             onClick={handleWrongAnswer}
-            className="w-full bg-danger text-white font-semibold py-2 rounded-lg  hover:bg-primary hover:text-white transition duration-300 transform active:scale-95"
+            className="w-full bg-danger text-white font-semibold py-2 rounded-lg    transition duration-300 transform active:scale-95"
           >
             {dict.wrongAnswer}
           </button>
           <button
             disabled={skiptIsLoading || !questions}
             onClick={handleSkip}
-            className="w-full bg-warning text-white font-semibold py-2 rounded-lg  hover:bg-primary hover:text-white transition duration-300 transform active:scale-95"
+            className="w-full bg-warning text-white font-semibold py-2 rounded-lg    transition duration-300 transform active:scale-95"
           >
             {dict.skipQuestion}
           </button>

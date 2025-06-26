@@ -50,13 +50,11 @@ export default function JoinRoomForm({ dict, lang }: JoinRoomFormProps) {
         return;
       }
 
-
       // 2. Redirect to the player's room
 
       router.push(`/${lang}/Player/${roomResult.roomId}`);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-    }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {}
   };
 
   return (
@@ -114,7 +112,7 @@ export default function JoinRoomForm({ dict, lang }: JoinRoomFormProps) {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-primary text-white font-semibold py-3 rounded-lg shadow-md hover:bg-secondary transition duration-300 transform active:scale-95"
+            className="w-full bg-primary text-white font-semibold py-3 rounded-lg shadow-md  transition duration-300 transform active:scale-95"
           >
             {dict.joinGame}
           </button>

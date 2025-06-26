@@ -54,7 +54,7 @@ const Players = ({ roomId, dict, lang }: PlayersProps) => {
           throw new Error(data.error || "Failed to get leaderboard");
         }
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         setError(dict.errors.FailedToGetLeaderboard);
       }
@@ -66,7 +66,7 @@ const Players = ({ roomId, dict, lang }: PlayersProps) => {
     (data: Player[]) => {
       try {
         setPlayers(data);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         setError(dict.errors.failedToGetStatus);
       }
@@ -77,26 +77,22 @@ const Players = ({ roomId, dict, lang }: PlayersProps) => {
   usePusherBind(channel, "leader-board", handleList);
 
   //handle game end
-  const handelGameEnd = useCallback(
-    async () => {
-      try {
+  const handelGameEnd = useCallback(async () => {
+    try {
+      document.cookie = "token=; Max-Age=0; path=/";
 
-        document.cookie = "token=; Max-Age=0; path=/";
+      localStorage.removeItem("roomId");
+      sessionStorage.clear();
 
-        localStorage.removeItem("roomId");
-        sessionStorage.clear();
-
-        // Wait for 1 minutes before redirecting
-        setTimeout(() => {
-          router.push(`/${lang}/`);
-        }, 60000);
+      // Wait for 1 minutes before redirecting
+      setTimeout(() => {
+        router.push(`/${lang}/`);
+      }, 60000);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (err) {
-        setError(dict.errors.failedToEndGame);
-      }
-    },
-    [dict.errors.failedToEndGame, lang, router]
-  );
+    } catch (err) {
+      setError(dict.errors.failedToEndGame);
+    }
+  }, [dict.errors.failedToEndGame, lang, router]);
 
   usePusherBind(channel, "end-game", handelGameEnd);
 
@@ -121,7 +117,7 @@ const Players = ({ roomId, dict, lang }: PlayersProps) => {
         sortedPlayers.map((player, idx) => (
           <div
             key={player.player + idx}
-            className="flex justify-between text-lg items-center mb-2 pb-1 border-b border-gray-300 w-full px-5"
+            className="flex justify-between text-lg items-center mb-2 pb-1 border-b border-muted w-full px-5"
           >
             <div className="w-2/3 text-center">
               <AutoTextSize

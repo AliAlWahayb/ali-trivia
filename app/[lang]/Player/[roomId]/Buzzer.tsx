@@ -62,7 +62,7 @@ const Buzzer = ({ roomId, username, dict, lang }: BuzzerProps) => {
           throw new Error(data.error || "Failed to get queue");
         }
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         setError(dict.errors.FailedToGetQueue);
       }
@@ -77,7 +77,7 @@ const Buzzer = ({ roomId, username, dict, lang }: BuzzerProps) => {
     (data: string[]) => {
       try {
         updateBuzzState(data);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         setError(dict.errors.FailedToUpdateQueueStatus);
       }
@@ -122,7 +122,7 @@ const Buzzer = ({ roomId, username, dict, lang }: BuzzerProps) => {
         throw new Error(data.error || "Failed to buzz in");
       }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setError(dict.errors.FailedToBuzzIn);
     } finally {
@@ -136,7 +136,7 @@ const Buzzer = ({ roomId, username, dict, lang }: BuzzerProps) => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen w-full h-full bg-red-100 p-0">
+    <div className="flex flex-col min-h-screen w-full h-full rounded-lg  p-0">
       {error && (
         <ErrorAlert
           message={error}
@@ -148,12 +148,8 @@ const Buzzer = ({ roomId, username, dict, lang }: BuzzerProps) => {
         disabled={buzzedIn || isLoading || !channel}
         onClick={handleBuzzIn}
         className={`flex-1 w-full h-full text-white text-5xl text-center font-semibold rounded-lg transition duration-300 transform active:scale-95 ${
-          buzzedIn
-            ? yourTurn
-              ? "bg-green-500"
-              : "bg-yellow-500"
-            : "bg-blue-500"
-        } hover:bg-blue-600 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed`}
+          buzzedIn ? (yourTurn ? "bg-success" : "bg-warning") : "bg-secondary"
+        }  flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed`}
         style={{ minHeight: "100%" }}
       >
         {!channel

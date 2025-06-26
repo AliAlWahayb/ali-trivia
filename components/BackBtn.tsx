@@ -86,7 +86,7 @@ const BackBtn = ({
     <button
       onClick={handleBack}
       type="button"
-      className="bg-backgroundLight text-primary text-center font-semibold border-2 border-primary p-1 rounded-lg hover:bg-primary hover:text-white transition duration-300 transform active:scale-95 flex items-center justify-center"
+      className="bg-background-light text-primary text-center font-semibold border-1 border-primary p-1 rounded-lg   transition duration-300 transform active:scale-95 flex items-center justify-center"
       aria-label="Go Back"
     >
       <ArrowLeftIcon className="w-5 h-5" />

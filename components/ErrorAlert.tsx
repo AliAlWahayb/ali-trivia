@@ -13,7 +13,7 @@ const ErrorAlert: React.FC<ErrorAlertProps> = ({
   onDismiss,
   dict,
 }) => (
-  <div className="bg-red-500 text-white p-2 text-center rounded">
+  <div className="bg-danger text-white p-2 text-center rounded">
     {message}
     <button onClick={onDismiss} className="mx-2 text-xs underline">
       {dict.dismiss}

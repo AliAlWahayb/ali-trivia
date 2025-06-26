@@ -57,7 +57,7 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
           throw new Error(data.error || "Failed to get leaderboard");
         }
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         setError(dict.errors.FailedToGetLeaderboard);
       }
@@ -69,26 +69,22 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
   const { channel, error: pusherError } = usePusherSubscribe(channelName);
 
   //handle game end
-  const handelGameEnd = useCallback(
-    async () => {
-      try {
+  const handelGameEnd = useCallback(async () => {
+    try {
+      document.cookie = "token=; Max-Age=0; path=/";
 
-        document.cookie = "token=; Max-Age=0; path=/";
+      localStorage.removeItem("roomId");
+      sessionStorage.clear();
 
-        localStorage.removeItem("roomId");
-        sessionStorage.clear();
-
-        // Wait for 1 minutes before redirecting
-        setTimeout(() => {
-          router.push(`/${lang}`);
-        }, 60000);
+      // Wait for 1 minutes before redirecting
+      setTimeout(() => {
+        router.push(`/${lang}`);
+      }, 60000);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (err) {
-        setError(dict.errors.failedToEndGame);
-      }
-    },
-    [dict.errors.failedToEndGame, lang, router]
-  );
+    } catch (err) {
+      setError(dict.errors.failedToEndGame);
+    }
+  }, [dict.errors.failedToEndGame, lang, router]);
 
   usePusherBind(channel, "end-game", handelGameEnd);
 
@@ -96,7 +92,7 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
     (data: Player[]) => {
       try {
         setPlayers(data);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         setError(dict.errors.failedToGetStatus);
       }
@@ -130,7 +126,7 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
       if (!response.ok) {
         throw new Error(data.error || "Failed to get leaderboard");
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setError(dict.errors.FailedToGetLeaderboard);
     }
@@ -160,7 +156,7 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
       }
       // Force refresh leaderboard after kick
       await fetchLeaderboard();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setError(dict.errors.FailedToKickPlayer);
     } finally {
@@ -194,7 +190,7 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
         throw new Error(data.error || "Failed to end game");
       }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setError(dict.errors.failedToEndGame);
     } finally {
@@ -220,7 +216,7 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
           </p>
           <button
             onClick={() => router.push(`/${lang}`)}
-            className="bg-white text-text-primary px-4 py-2 rounded hover:bg-gray-100"
+            className="bg-white text-text-primary px-4 py-2 rounded "
           >
             {dict.goHome}
           </button>
@@ -230,7 +226,7 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
   }
 
   return (
-    <div className="w-full max-w-md bg-gray-100 rounded-lg  px-6 py-3 ">
+    <div className="w-full max-w-md bg-card rounded-lg  px-6 py-3 ">
       <Accordion.Root type="single" collapsible className="w-full ">
         <Accordion.Item value="item-1" className="">
           <Accordion.Header className="flex justify-between items-center">
@@ -278,7 +274,7 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
                 {sortedPlayers.map((player, idx) => (
                   <div
                     key={player.player + idx}
-                    className="grid grid-cols-3 gap-4 mb-2 border-b border-gray-300 pb-1"
+                    className="grid grid-cols-3 gap-4 mb-2 border-b border-muted pb-1"
                   >
                     <div className="flex items-center justify-center">
                       <AutoTextSize
@@ -298,7 +294,7 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
                       <button
                         disabled={kickIsLoading}
                         onClick={() => handelKick(player.player)}
-                        className="bg-danger text-white font-semibold px-2 py-0.5 rounded-lg hover:bg-primary hover:text-white transition duration-300 transform active:scale-95"
+                        className="bg-danger text-white font-semibold px-2 py-0.5 rounded-lg   transition duration-300 transform active:scale-95"
                       >
                         {dict.kick}
                       </button>
@@ -311,7 +307,7 @@ const AdminAccordion = ({ roomId, dict, lang }: Props) => {
                 <button
                   disabled={players.length === 0 || endIsLoading}
                   onClick={() => handelEnd()}
-                  className=" bg-danger text-white font-semibold px-2 py-0.5 rounded-lg  hover:bg-primary hover:text-white transition duration-300 transform active:scale-95"
+                  className=" bg-danger text-white font-semibold px-2 py-0.5 rounded-lg    transition duration-300 transform active:scale-95"
                 >
                   {dict.endGame}
                 </button>

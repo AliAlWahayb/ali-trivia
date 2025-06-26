@@ -4,6 +4,7 @@ import RealFooter from "@/components/RealFooter";
 import { getDictionary } from "./dictionaries";
 import SetCsrfCookie from "./set-csrf-cookie.client";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import KeepAwake from "@/components/KeepAwake";
 
 // Dynamic metadata based on language
 export async function generateMetadata({
@@ -57,6 +58,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <SetCsrfCookie />
+        <KeepAwake />
         {children}
         <SpeedInsights />
         <RealFooter lang={lang} dict={dict} />

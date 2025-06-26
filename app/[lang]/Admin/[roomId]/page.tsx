@@ -33,7 +33,7 @@ export default async function Room({
       <div className="w-full max-w-xs flex flex-row items-center justify-between mb-6">
         <BackBtn role={payload.role} roomId={roomId} dict={dict} lang={lang} />
         <div className="flex-1 flex justify-center">
-          <div className="bg-blue-50 border border-blue-200 text-blue-800 text-sm p-3 rounded-md text-center font-medium">
+          <div className="bg-primary/10 border border-primary/80 text-secondary text-sm p-2 rounded-md text-center font-medium">
             {dict.yourRoomId}:{" "}
             <span className="font-bold text-lg">{roomId}</span>
           </div>

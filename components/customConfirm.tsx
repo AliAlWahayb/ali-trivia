@@ -38,7 +38,7 @@ export function customConfirm(
           <div
             className={`flex flex-col bg-background-light rounded-lg p-6 w-fit text-center ${ANIMATE_BASE}`}
           >
-            <div className=" text-lg text-start text-textPrimary mb-4">
+            <div className=" text-lg text-start text-text-primary mb-4">
               {message}
             </div>
             <div className="flex justify-end gap-4 ">
@@ -47,7 +47,7 @@ export function customConfirm(
                   resolve(false);
                   cleanup();
                 }}
-                className="px-4 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300"
+                className="px-4 py-2 rounded-lg bg-card text-text-secondary"
               >
                 {dict ? dict.dismiss : cancelText}
               </button>
@@ -56,7 +56,7 @@ export function customConfirm(
                   resolve(true);
                   cleanup();
                 }}
-                className="px-4 py-2 rounded bg-primary text-white hover:bg-primary-dark"
+                className="px-4 py-2 rounded-lg bg-primary text-white -dark"
               >
                 {dict ? dict.yes : confirmText}
               </button>
