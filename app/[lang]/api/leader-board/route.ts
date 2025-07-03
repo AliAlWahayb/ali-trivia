@@ -1,5 +1,5 @@
 import { signToken } from "@/lib/jwt";
-import { leaderboard } from "@/lib/roomQueues";
+import { getLeaderboard } from "@/lib/roomQueues";
 import { NextResponse } from "next/server";
 
 
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
         });
 
         // Check if the leaderboard exists for the roomId
-        if (!leaderboard[roomId]) {
+        if (!(await getLeaderboard(roomId))) {
             return NextResponse.json({ error: 'Room not found' }, { status: 400 });
         }
 

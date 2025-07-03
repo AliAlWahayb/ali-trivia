@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { signToken } from "@/lib/jwt";
-import { leaderboard } from "@/lib/roomQueues";
 import { triggerEvent } from "@/lib/pusherServer";
+import { getLeaderboard, setLeaderboard } from "@/lib/roomQueues";
 
 
 
@@ -33,20 +33,20 @@ export async function POST(request: Request) {
         });
 
         // Check if the leaderboard exists for the roomId
-        if (!leaderboard[roomId]) {
+        if (!(await getLeaderboard(roomId))) {
             return NextResponse.json({ error: 'Room not found' }, { status: 400 });
         }
 
         // Check if the player is already in the leaderboard
-        if (leaderboard[roomId].some(entry => entry.player === player)) {
+        if ((await getLeaderboard(roomId)).some(entry => entry.player === player)) {
             return NextResponse.json({ error: 'Player already in the leaderboard' }, { status: 400 });
         }
 
         // Add the player to the leaderboard with an initial score of 0
-        leaderboard[roomId].push({ player, score: 0 });
+        await setLeaderboard(roomId, [...(await getLeaderboard(roomId)), { player, score: 0 }]);
 
         // Trigger the 'leader-board' event to notify others about the leaderboard update
-        await triggerEvent(`room-${roomId}`, 'leader-board', leaderboard[roomId]);
+        await triggerEvent(`room-${roomId}`, 'leader-board', await getLeaderboard(roomId));
 
         // Set token as a cookie and return the response
         const response = NextResponse.json({ success: true, roomId });

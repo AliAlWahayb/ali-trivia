@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/jwt';
 import { cookies } from 'next/headers';
-import { leaderboard } from '@/lib/roomQueues';
+import { getLeaderboard, setLeaderboard } from '@/lib/roomQueues';
 
 function isValidRoomId(roomId: string) {
   return /^\d{4}$/.test(roomId);
@@ -32,15 +32,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if the leaderboard exists
-    if (!leaderboard[roomId]) {
+    if (!(await getLeaderboard(roomId))) {
       if (payload.role == 'admin') {
-        leaderboard[roomId] = [];
+        await setLeaderboard(roomId, []);
       }
     }
 
     return NextResponse.json({
       success: true,
-      leaderboard: leaderboard[roomId],
+      leaderboard: await getLeaderboard(roomId),
     });
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

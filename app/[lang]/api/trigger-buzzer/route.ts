@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { triggerEvent } from '@/lib/pusherServer';
 import { verifyToken } from '@/lib/jwt';
 import { cookies } from 'next/headers';
-import { leaderboard, roomQueues } from '@/lib/roomQueues';
+import { getRoomQueue, getLeaderboard, setRoomQueue } from '@/lib/roomQueues';
 
 
 function isValidRoomId(roomId: string) {
@@ -29,23 +29,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid room ID. Must be a 4-digit number.' }, { status: 400 });
     }
 
-    if (!roomQueues[roomId]) {
+    if (!(await getRoomQueue(roomId))) {
       return NextResponse.json({ error: 'Queue not found' }, { status: 400 });
     }
-    if (roomQueues[roomId].includes(player)) {
+    if ((await getRoomQueue(roomId)).includes(player)) {
       return NextResponse.json({ error: 'Player already in the queue' }, { status: 400 });
     }
-    if (!leaderboard[roomId].some(p => p.player === player)) {
+    if (!(await getLeaderboard(roomId)).some(p => p.player === player)) {
       return NextResponse.json({ error: 'Player not in the leaderboard' }, { status: 400 });
     }
 
-    roomQueues[roomId].push(player);
+    await setRoomQueue(roomId, [...(await getRoomQueue(roomId)), player]);
 
-    await triggerEvent(`room-${roomId}`, 'buzzer-queue', roomQueues[roomId]);
+    await triggerEvent(`room-${roomId}`, 'buzzer-queue', await getRoomQueue(roomId));
 
     return NextResponse.json({
       success: true,
-      queue: roomQueues[roomId],
+      queue: await getRoomQueue(roomId),
     });
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

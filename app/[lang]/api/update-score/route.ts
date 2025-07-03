@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { triggerEvent } from '@/lib/pusherServer';
 import { verifyToken } from '@/lib/jwt';
 import { cookies } from 'next/headers';
-import { leaderboard, roomQueues } from '@/lib/roomQueues';
+import { getLeaderboard, setLeaderboard, setRoomQueue, getRoomQueue } from '@/lib/roomQueues';
 
 
 
@@ -39,16 +39,16 @@ export async function POST(request: NextRequest) {
 
 
     // Check if the leaderboard exists
-    if (!leaderboard[roomId]) {
+    if (!(await getLeaderboard(roomId))) {
       return NextResponse.json({ error: 'Leaderboard not found' }, { status: 400 });
     }
 
-    if (leaderboard[roomId].length === 0) {
+    if ((await getLeaderboard(roomId)).length === 0) {
       return NextResponse.json({ error: 'Leaderboard is empty' }, { status: 400 });
     }
 
     // Check if the player is in the leaderboard
-    const playerInLeaderboard = leaderboard[roomId].find((p) => p.player === player);
+    const playerInLeaderboard = (await getLeaderboard(roomId)).find((p) => p.player === player);
 
     if (!playerInLeaderboard) {
       return NextResponse.json({ error: 'Player not in the leaderboard' }, { status: 400 });
@@ -56,26 +56,26 @@ export async function POST(request: NextRequest) {
 
 
     // update the player's score
-    leaderboard[roomId] = leaderboard[roomId].map((p) => {
+    await setLeaderboard(roomId, (await getLeaderboard(roomId)).map((p) => {
       if (p.player === player) {
         return { ...p, score: p.score + 1 };
       }
       return p;
-    });
+    }));
 
     // empty the queue
-    roomQueues[roomId] = [];
+    await setRoomQueue(roomId, []);
 
     // Trigger the 'buzzer-queue' event to notify others
-    await triggerEvent(`room-${roomId}`, 'buzzer-queue', roomQueues[roomId]);
+    await triggerEvent(`room-${roomId}`, 'buzzer-queue', await getRoomQueue(roomId));
 
 
     // Trigger the 'leader-board' event to notify others
-    await triggerEvent(`room-${roomId}`, 'leader-board', leaderboard[roomId]);
+    await triggerEvent(`room-${roomId}`, 'leader-board', await getLeaderboard(roomId));
 
     return NextResponse.json({
       success: true,
-      queue: leaderboard[roomId],
+      queue: await getLeaderboard(roomId),
     });
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { triggerEvent } from '@/lib/pusherServer';
 import { verifyToken } from '@/lib/jwt';
 import { cookies } from 'next/headers';
-import { leaderboard, roomQueues } from '@/lib/roomQueues';
+import { getLeaderboard, setLeaderboard, getRoomQueue, setRoomQueue } from '@/lib/roomQueues';
 
 
 function isValidRoomId(roomId: string) {
@@ -37,31 +37,31 @@ export async function POST(request: NextRequest) {
 
 
     // Check if the room exists in the leaderboard
-    if (!leaderboard[roomId]) {
+    if (!(await getLeaderboard(roomId))) {
       return NextResponse.json({ error: 'Room not found' }, { status: 404 });
     }
 
     // Check if the player is in the leaderboard
-    const playerInLeaderboard = leaderboard[roomId].find((p) => p.player === player);
+    const playerInLeaderboard = (await getLeaderboard(roomId)).find((p) => p.player === player);
 
     if (!playerInLeaderboard) {
       return NextResponse.json({ error: 'Player not in the leaderboard' }, { status: 400 });
     }
 
     // Remove the player from the leaderboard
-    leaderboard[roomId] = leaderboard[roomId].filter((p) => p.player !== player);
+    await setLeaderboard(roomId, (await getLeaderboard(roomId)).filter((p) => p.player !== player));
 
     // Trigger the 'leader-board' event to notify others
-    await triggerEvent(`room-${roomId}`, 'leader-board', leaderboard[roomId]);
+    await triggerEvent(`room-${roomId}`, 'leader-board', await getLeaderboard(roomId));
 
     // Check if the player is in the roomQueues
-    const playerInRoomQueues = roomQueues[roomId].find((p) => p === player);
+    const playerInRoomQueues = (await getRoomQueue(roomId)).find((p) => p === player);
 
     if (playerInRoomQueues) {
       // Remove the player from the roomQueues
-      roomQueues[roomId] = roomQueues[roomId].filter((p) => p !== player);
+      await setRoomQueue(roomId, (await getRoomQueue(roomId)).filter((p) => p !== player));
       // Trigger the 'buzzer-queue' event to notify others
-      await triggerEvent(`room-${roomId}`, 'buzzer-queue', roomQueues[roomId]);
+      await triggerEvent(`room-${roomId}`, 'buzzer-queue', await getRoomQueue(roomId));
     }
 
     return NextResponse.json({
