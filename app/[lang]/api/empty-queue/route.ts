@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { triggerEvent } from '@/lib/pusherServer';
 import { verifyToken } from '@/lib/jwt';
 import { cookies } from 'next/headers';
-import { roomQueues } from '@/lib/roomQueues';
+import { getRoomQueue, setRoomQueue } from '@/lib/roomQueues';
 
 function isValidRoomId(roomId: string) {
   return /^\d{4}$/.test(roomId);
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if the queue exists
-    if (!roomQueues[roomId]) {
+    if (!(await getRoomQueue(roomId))) {
       return NextResponse.json({ error: 'Queue not found' }, { status: 400 });
     }
 
@@ -42,14 +42,14 @@ export async function POST(request: NextRequest) {
     // }
 
     // empty the queue
-    roomQueues[roomId] = [];
+    await setRoomQueue(roomId, []);
 
     // Trigger the 'buzzer-queue' event to notify others
-    await triggerEvent(`room-${roomId}`, 'buzzer-queue', roomQueues[roomId]);
+    await triggerEvent(`room-${roomId}`, 'buzzer-queue', await getRoomQueue(roomId));
 
     return NextResponse.json({
       success: true,
-      queue: roomQueues[roomId],
+      queue: await getRoomQueue(roomId),
     });
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

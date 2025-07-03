@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/jwt';
 import { cookies } from 'next/headers';
-import { leaderboard, roomQueues } from '@/lib/roomQueues';
 import { triggerEvent } from '@/lib/pusherServer';
+import { getLeaderboard, setLeaderboard, setRoomQueue } from '@/lib/roomQueues';
 
 function isValidRoomId(roomId: string) {
   return /^\d{4}$/.test(roomId);
@@ -31,23 +31,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid room ID. Must be a 4-digit number.' }, { status: 400 });
     }
 
-    if (!leaderboard[roomId]) {
+    if (!(await getLeaderboard(roomId))) {
       return NextResponse.json({ error: 'Leaderboard not found' }, { status: 400 });
     }
 
-    if (leaderboard[roomId].length === 0) {
+    if ((await getLeaderboard(roomId)).length === 0) {
       return NextResponse.json({ error: 'Leaderboard is empty' }, { status: 400 });
     }
 
-    const topScorePlayer = leaderboard[roomId].length > 0
-      ? leaderboard[roomId].reduce((max, current) => {
+    const topScorePlayer = (await getLeaderboard(roomId)).length > 0
+      ? (await getLeaderboard(roomId)).reduce((max, current) => {
         return current.score > max.score ? current : max;
-      }, leaderboard[roomId][0])
+      }, (await getLeaderboard(roomId))[0])
       : null;
 
     // Delete the leaderboard and queue for the room
-    delete leaderboard[roomId];
-    delete roomQueues[roomId];
+    await setLeaderboard(roomId, []);
+    await setRoomQueue(roomId, []);
 
     const response = NextResponse.json({
       success: true,

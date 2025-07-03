@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/jwt';
 import { cookies } from 'next/headers';
-import { roomQueues } from '@/lib/roomQueues';
+import { getRoomQueue, setRoomQueue } from '@/lib/roomQueues';
 
 function isValidRoomId(roomId: string) {
   return /^\d{4}$/.test(roomId);
@@ -31,13 +31,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if the roomQueues exists
-    if (!roomQueues[roomId]) {
-      roomQueues[roomId] = [];
+    if (!(await getRoomQueue(roomId))) {
+      await setRoomQueue(roomId, []);
     }
 
     return NextResponse.json({
       success: true,
-      queue: roomQueues[roomId],
+      queue: await getRoomQueue(roomId),
     });
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

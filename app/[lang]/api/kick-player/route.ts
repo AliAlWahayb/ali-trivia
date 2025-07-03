@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { triggerEvent } from '@/lib/pusherServer';
 import { verifyToken } from '@/lib/jwt';
 import { cookies } from 'next/headers';
-import { leaderboard, roomQueues } from '@/lib/roomQueues';
+import { getLeaderboard, getRoomQueue, setLeaderboard, setRoomQueue } from '@/lib/roomQueues';
 
 
 function isValidRoomId(roomId: string) {
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     
 
     // Check if the player is in the leaderboard
-    const playerInLeaderboard = leaderboard[roomId].find((p) => p.player === player);
+    const playerInLeaderboard = (await getLeaderboard(roomId)).find((p) => p.player === player);
 
     if (!playerInLeaderboard) {
       return NextResponse.json({ error: 'Player not in the leaderboard' }, { status: 400 });
@@ -44,27 +44,27 @@ export async function POST(request: NextRequest) {
 
 
     // Remove the player from the leaderboard
-    leaderboard[roomId] = leaderboard[roomId].filter((p) => p.player !== player);
+    await setLeaderboard(roomId, (await getLeaderboard(roomId)).filter((p) => p.player !== player));
 
     // Always trigger the 'leader-board' event
-    await triggerEvent(`room-${roomId}`, 'leader-board', leaderboard[roomId]);
+    await triggerEvent(`room-${roomId}`, 'leader-board', await getLeaderboard(roomId));
 
     // Remove the player from the roomQueues if present
     let queueChanged = false;
-    if (roomQueues[roomId] && roomQueues[roomId].includes(player)) {
-      roomQueues[roomId] = roomQueues[roomId].filter((p) => p !== player);
+    if (await getRoomQueue(roomId) && (await getRoomQueue(roomId)).includes(player)) {
+      await setRoomQueue(roomId, (await getRoomQueue(roomId)).filter((p) => p !== player));
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       queueChanged = true;
       // console.log(`Player ${player} removed from room ${roomId} queue`);
     }
     // Always trigger the 'buzzer-queue' event after a kick
-    await triggerEvent(`room-${roomId}`, 'buzzer-queue', roomQueues[roomId] || []);
+    await triggerEvent(`room-${roomId}`, 'buzzer-queue', await getRoomQueue(roomId));
 
 
 
     return NextResponse.json({
       success: true,
-      queue: leaderboard[roomId],
+      queue: await getLeaderboard(roomId),
     });
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
